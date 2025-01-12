@@ -5,6 +5,7 @@ namespace tests;
 
 public class UnitTest1
 {
+    //Unit test 1
     [Fact]
     public async Task TestElectionTimeout()
     {
