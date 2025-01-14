@@ -21,6 +21,16 @@ public class Server
         ElectionTimeout = val;
     }
 
+    public void SendAppendEntriesLogTo(Server follower)
+    {
+        follower.ReceiveAppendEntriesLogFrom(this);
+    }
+
+    private void ReceiveAppendEntriesLogFrom(Server server)
+    {
+        this.RecognizedLeader = server;
+    }
+
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
     // {
     //     await Task.CompletedTask;

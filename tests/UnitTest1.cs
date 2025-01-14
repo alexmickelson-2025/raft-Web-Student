@@ -83,4 +83,20 @@ public class UnitTest1
         //Then I will assume it is truly random
         Assert.True(duplicatesCount < 34); //Chat gpt shows math for probaility of duplicates being 33%, to me it makes sense because 100/150 = 66%
     }
+
+    //Testing #2
+    //When a node receives an AppendEntries from another node, then first node remembers that other node is the current leader.
+    [Fact]
+    public void WhenNodeReceivesAppendEntries_ItKnowsTheNodeIsALeader()
+    {
+        //Arrange
+        Server leader = new();
+        Server follower = new();
+
+        //Act
+        leader.SendAppendEntriesLogTo(follower);
+
+        //Assert
+        
+    }
 }
