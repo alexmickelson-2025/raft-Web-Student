@@ -15,9 +15,9 @@ public class Server
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public Server RecognizedLeader = new Server();
 
-    public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
-    {
-        await Task.CompletedTask;
-        return;
-    }
+    // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
+    // {
+    //     await Task.CompletedTask;
+    //     return;
+    // }
 }
