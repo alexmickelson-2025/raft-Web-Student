@@ -17,8 +17,8 @@ public class Server
 
     public void ResetElectionTimeout()
     {
-        ElectionTimeout = 200;
-        throw new NotImplementedException(); //because it needs to be randomly generated
+        int val = (Random.Shared.Next() % 150) + 150;
+        ElectionTimeout = val;
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)

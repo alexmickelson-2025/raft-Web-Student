@@ -1,4 +1,5 @@
 ﻿using library;
+using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 
 namespace tests;
@@ -51,5 +52,35 @@ public class UnitTest1
 
         //Assert
         Assert.True((testServer.ElectionTimeout <= 300) && (testServer.ElectionTimeout >= 150));
+    }
+
+    [Fact]
+    public void WhenElectionTimeReset_ValueIsTrulyRandom() {
+        //Arrange
+        Server testServer = new();
+        Dictionary<int,int> countAppears = new();
+
+        //Act
+        for (int i = 0; i < 100; i++) {
+            testServer.ResetElectionTimeout();
+            if (countAppears.ContainsKey(testServer.ElectionTimeout)) {
+                countAppears[testServer.ElectionTimeout] = countAppears[testServer.ElectionTimeout] + 1;
+            }
+            else {
+                countAppears.Add(testServer.ElectionTimeout, 1);
+            }
+        }
+
+        //Assert
+        int duplicatesCount = 0;
+        foreach (var countPair in countAppears) {
+            if (countPair.Value > 1) {
+                duplicatesCount++;
+            }
+        }
+        Console.WriteLine("Duplicates count is ", duplicatesCount);
+        //If the number of duplicates is less than  a particular percentage of the times we ran it
+        //Then I will assume it is truly random
+        Assert.True(duplicatesCount < 34); //Chat gpt shows math for probaility of duplicates being 33%, to me it makes sense because 100/150 = 66%
     }
 }
