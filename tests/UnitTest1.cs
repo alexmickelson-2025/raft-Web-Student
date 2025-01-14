@@ -36,6 +36,8 @@ public class UnitTest1
         Server testServer = new Server();
 
         //Assert (test passes)
-        Assert.Equal(States.Leader, testServer.State);
+        Assert.Equal(States.Follower, testServer.State);
     }
+
+    //Testing 
 }

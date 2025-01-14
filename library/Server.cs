@@ -13,7 +13,7 @@ public class Server
 {
     public States State = States.Follower; 
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
-    public Server RecognizedLeader = new Server();
+    public Server? RecognizedLeader {get;set;}
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
     // {
