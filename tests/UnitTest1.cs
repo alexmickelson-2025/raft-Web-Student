@@ -39,5 +39,17 @@ public class UnitTest1
         Assert.Equal(States.Follower, testServer.State);
     }
 
-    //Testing 
+    //Testing # 5 
+    // When the election time is reset, it is a random value between 150 and 300ms.
+    [Fact]
+    public void WhenElectionTimeReset_ItIsBetween150And300ms() {
+        //Arrange
+        Server testServer = new Server();
+
+        //Act (reset election time)
+        testServer.ResetElectionTimeout();
+
+        //Assert
+        Assert.True((testServer.ElectionTimeout <= 300) && (testServer.ElectionTimeout >= 150));
+    }
 }
