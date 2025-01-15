@@ -1,5 +1,6 @@
 ﻿using library;
 using System.Collections;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 namespace tests;
@@ -27,7 +28,7 @@ public class UnitTest1
 
     /********************************** *****************/
 
-    //Testing # 3
+    //Testing #3
     //When a new node is initialized, it should be in follower state.
     [Fact]
     public void WhenNodeIsInitialized_ItIsInFollowerState()
@@ -40,7 +41,7 @@ public class UnitTest1
         Assert.Equal(States.Follower, testServer.State);
     }
 
-    //Testing # 5 
+    //Testing #5 
     // When the election time is reset, it is a random value between 150 and 300ms.
     [Fact]
     public void WhenElectionTimeReset_ItIsBetween150And300ms() {
@@ -54,6 +55,7 @@ public class UnitTest1
         Assert.True((testServer.ElectionTimeout <= 300) && (testServer.ElectionTimeout >= 150));
     }
 
+    //still testing #5  (see above test as well)
     [Fact]
     public void WhenElectionTimeReset_ValueIsTrulyRandom() {
         //Arrange
@@ -97,6 +99,29 @@ public class UnitTest1
         leader.SendAppendEntriesLogTo(follower);
 
         //Assert
-        
+        Assert.Equal(leader, follower.RecognizedLeader);
     }
+
+    //Testing #17
+    //When a follower node receives an AppendEntries request, it sends a response.
+    [Fact]
+    public void WhenReceivesAppendEntries_SendsResponse()
+    {
+        //Arrange
+        Server follower = new();
+        Server leader = new();
+
+        //Act
+        //i could keep track of the request id that it is rejecting or receiving so that when I need to know which one they're responding to I can tell
+        //give my server an id too
+        follower.ReceiveAppendEntriesLogFrom(leader, 1); //reequest id 1
+
+        //Assert
+        Assert.True(leader.AppendEntriesResponseLog[1]);
+    }
+
+    //Testing #7
+    //When a follower does get an AppendEntries message, it resets the election timer. (i.e. it doesn't start an election even after more than 300ms)
+    //[Fact]
+    //public void WhenReceivesAppendEntries_ResetsElectionTimer
 }
