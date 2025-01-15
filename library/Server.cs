@@ -42,6 +42,7 @@ public class Server
         else
         {
             this.SendAppendEntriesResponseTo(server, requestNumber, true);
+            this.State = States.Follower;
             this.timeSinceHearingFromLeader.Reset();
             this.timeSinceHearingFromLeader.Start();
         }

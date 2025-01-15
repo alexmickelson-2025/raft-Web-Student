@@ -162,4 +162,24 @@ public class UnitTest1
         //Idea for the future we could also ensure the reset timer function was called.
         //I could also wrap the stopwatch in a class that would be easier to mock out. I think that actually would be a better way to test it??
     }
+
+    //Testing #12
+    //Given a candidate, when it receives an AppendEntries message from a node with a later term, then candidate loses and becomes a follower.
+    [Fact]
+    public void WhenCandidateReceivesAppendEntriesMessageWithLaterTerm_ThenRevertsToFollowerState()
+    {
+        //Arrange
+        Server candidate = new();
+        candidate.CurrentTerm = 2;
+        candidate.State = States.Candidate;
+
+        Server newLeader = new();
+        newLeader.CurrentTerm = 13;
+
+        //Act
+        newLeader.SendAppendEntriesLogTo(candidate);
+
+        //Assert
+        Assert.Equal(States.Follower, candidate.State);
+    }
 }
