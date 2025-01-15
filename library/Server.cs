@@ -14,7 +14,9 @@ public class Server
     public States State = States.Follower; 
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public Server? RecognizedLeader {get;set;}
+
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
+    public int CurrentTerm { get; set; }
 
     public void ResetElectionTimeout()
     {
@@ -24,26 +26,33 @@ public class Server
 
     public void SendAppendEntriesLogTo(Server follower)
     {
-        follower.ReceiveAppendEntriesLogFrom(this, 0); //I need to be able to automatically increment this
+        follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm); //I need to be able to automatically increment this
     }
 
-    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber)
+    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {
         this.RecognizedLeader = server;
-        this.SendAppendEntriesResponseTo(server, requestNumber, true);
+        if (requestCurrentTerm < this.CurrentTerm)
+        {
+            this.SendAppendEntriesResponseTo(server, requestNumber, false);
+        }
+        else
+        {
+            this.SendAppendEntriesResponseTo(server, requestNumber, true);
+        }
     }
 
-    private void SendAppendEntriesResponseTo(Server server, int requestNumber, bool v)
+    private void SendAppendEntriesResponseTo(Server server, int requestNumber, bool accepted)
     {
-        server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, v);
+        server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
     }
 
-    public void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool v)
+    public void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted)
     {
 
         if (!AppendEntriesResponseLog.ContainsKey(requestNumber))
         {
-            AppendEntriesResponseLog.Add(requestNumber, v);
+            AppendEntriesResponseLog.Add(requestNumber, accepted);
         }
     }
 

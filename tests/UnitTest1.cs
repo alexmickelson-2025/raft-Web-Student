@@ -110,14 +110,33 @@ public class UnitTest1
         //Arrange
         Server follower = new();
         Server leader = new();
+        follower.CurrentTerm = 1;
 
         //Act
         //i could keep track of the request id that it is rejecting or receiving so that when I need to know which one they're responding to I can tell
         //give my server an id too
-        follower.ReceiveAppendEntriesLogFrom(leader, 1); //reequest id 1
+        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //reequest id 1
 
         //Assert
         Assert.True(leader.AppendEntriesResponseLog[1]);
+    }
+
+    //Testing #18
+    //Given a candidate receives an AppendEntries from a previous term, then rejects.
+    [Fact]
+    public void WhenReceivesAppendEntriesFromPreviousTerm_ThenRejects()
+    {
+        //Arrange
+        Server follower = new ();
+        Server leader = new();
+        follower.CurrentTerm = 2;
+
+        //Act
+        //give my server an id too
+        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //request id 1
+
+        //Assert
+        Assert.False(leader.AppendEntriesResponseLog[1]);
     }
 
     //Testing #7
