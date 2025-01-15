@@ -10,7 +10,7 @@
     - wait 300 ms
     - reread term (?)
     - assert after is greater (by at least 1)
-7) When a follower does get an AppendEntries message, it resets the election timer. (i.e. it doesn't start an election even after more than 300ms)
+7) ~~When a follower does get an AppendEntries message, it resets the election timer. (i.e. it doesn't start an election even after more than 300ms)~~
 8) Given an election begins, when the candidate gets a majority of votes, it becomes a leader. (think of the easy case; can use two tests for single and multi-node clusters)
 9) Given a candidate receives a majority of votes while waiting for unresponsive node, it still becomes a leader.
 10) A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)

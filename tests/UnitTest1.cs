@@ -143,7 +143,7 @@ public class UnitTest1
     //Testing #7
     //When a follower does get an AppendEntries message, it resets the election timer. (i.e.it doesn't start an election even after more than 300ms)
     [Fact]
-    public async Task WhenReceivesAppendEntries_ResetsElectionTimer()
+    public void WhenReceivesAppendEntries_ResetsElectionTimer()
     {
         //Arrange
         Server follower = new();
