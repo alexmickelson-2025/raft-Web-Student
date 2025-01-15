@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace tests;
 
@@ -140,7 +141,25 @@ public class UnitTest1
     }
 
     //Testing #7
-    //When a follower does get an AppendEntries message, it resets the election timer. (i.e. it doesn't start an election even after more than 300ms)
-    //[Fact]
-    //public void WhenReceivesAppendEntries_ResetsElectionTimer
+    //When a follower does get an AppendEntries message, it resets the election timer. (i.e.it doesn't start an election even after more than 300ms)
+    [Fact]
+    public async Task WhenReceivesAppendEntries_ResetsElectionTimer()
+    {
+        //Arrange
+        Server follower = new();
+        follower.CurrentTerm = 13; //I just need it to be less than or equal to the term the request is sent on so we don't reject the request and not reset the timer.
+        follower.timeSinceHearingFromLeader.Start();
+        Server leader = new();
+
+        //Act
+        Thread.Sleep(301); //because normally by 300 ms this would for sure start an election, but here we need to reset the election timer when we receive the request.
+        follower.ReceiveAppendEntriesLogFrom(leader, 15, 15);
+
+        //Assert
+        //I do less than 40 because it may take some time to reset it but it certainly won't be 300 like it was before
+        var time = follower.timeSinceHearingFromLeader.ElapsedMilliseconds;
+        Assert.True(follower.timeSinceHearingFromLeader.ElapsedMilliseconds >= 0 && follower.timeSinceHearingFromLeader.ElapsedMilliseconds < 40); 
+        //Idea for the future we could also ensure the reset timer function was called.
+        //I could also wrap the stopwatch in a class that would be easier to mock out. I think that actually would be a better way to test it??
+    }
 }

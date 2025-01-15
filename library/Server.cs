@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace library;
 
@@ -17,6 +18,8 @@ public class Server
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
+
+    public Stopwatch timeSinceHearingFromLeader = new();
 
     public void ResetElectionTimeout()
     {
@@ -39,6 +42,8 @@ public class Server
         else
         {
             this.SendAppendEntriesResponseTo(server, requestNumber, true);
+            this.timeSinceHearingFromLeader.Reset();
+            this.timeSinceHearingFromLeader.Start();
         }
     }
 
