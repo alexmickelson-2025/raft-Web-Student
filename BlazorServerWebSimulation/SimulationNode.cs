@@ -5,9 +5,9 @@ using library;
 namespace Simulation;
 public class SimulationNode: Server {
     public readonly SimulationNode InnerNode;
-    public SimulationNode(Server node) {
-        this.InnerNode = node;
-    }
+    //public SimulationNode(Server node) {
+    //    this.InnerNode = node;
+    //}
 
     public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
     public Server? Leader {get => InnerNode.RecognizedLeader; set => InnerNode.RecognizedLeader = value;}
