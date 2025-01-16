@@ -195,6 +195,62 @@ public class UnitTest1
 
         //Assert
         //I could check that its vote is written to a votes list
-        Assert.Contains(willBeCandidate, willBeCandidate.Votes);
+        Assert.Contains(willBeCandidate, willBeCandidate.VotesReceived);
+    }
+
+    //Testing #10
+    //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+    [Fact]
+    public void IfHaveNotYetVoted_VoteForALaterTermRequest() {
+        //Arrange
+        Server willSayYes = new();
+        willSayYes.CurrentTerm = 1;
+        Server inLaterTerm = new();
+        inLaterTerm.CurrentTerm = 2;
+        willSayYes.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
+
+        //Act
+        inLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+
+        //Assert
+        Assert.Contains(willSayYes, inLaterTerm.VotesReceived);
+    }
+
+    //Testing #10
+    //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+    [Fact]
+    public void IfHaveNotYetVoted_StillDontVoteForAnEarlierTermRequest() {
+        //Arrange
+        Server willSayYes = new();
+        willSayYes.CurrentTerm = 1;
+        Server inLaterTerm = new();
+        inLaterTerm.CurrentTerm = 0;
+        willSayYes.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
+
+        //Act
+        inLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+
+        //Assert
+        Assert.DoesNotContain(willSayYes, inLaterTerm.VotesReceived);
+    }
+
+    //Testing #10
+    //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+    [Fact]
+    public void IfAlreadyVoted_DontVoteThatTermAgain() {
+        //Arrange
+        Server someRandomServerWeVotedForInThatTerm = new();
+        Server willSayNo = new();
+        willSayNo.CurrentTerm = 1;
+        willSayNo.VotesCast.Add(2, someRandomServerWeVotedForInThatTerm);
+        Server inLaterTerm = new();
+        inLaterTerm.CurrentTerm = 2;
+        willSayNo.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
+
+        //Act
+        inLaterTerm.SendRequestForVoteRPCTo(willSayNo); //I may also have a bug where I think I append the wrong "vote term" to the log
+
+        //Assert
+        Assert.DoesNotContain(willSayNo, inLaterTerm.VotesReceived);
     }
 }

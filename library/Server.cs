@@ -18,7 +18,9 @@ public class Server
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
-    public List<Server> Votes = new(); //If it has a Server in it, that means the server has voted for it with that current term.
+    public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
+
+    public List<Server> VotesReceived = new(); //If it has a Server in it, that means the server has voted for it with that current term.
 
     public Stopwatch timeSinceHearingFromLeader = new();
 
@@ -65,7 +67,37 @@ public class Server
 
     public void StartElection()
     {
-        this.Votes.Add(this);
+        this.VotesReceived.Add(this);
+    }
+
+    public void SendRequestForVoteRPCTo(Server server)
+    {
+        server.ReceiveVoteRequestFrom(this, this.CurrentTerm);
+    }
+
+    //The reason we pass the requestedVote current term (even though it's a property on the server requesting) is the server requesting might update its term after we receive it, so we can't trust that property and must specify it
+    private void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
+    {
+        if (requestedVoteCurrentTerm > this.CurrentTerm) {
+            if(!VotesCast.ContainsKey(requestedVoteCurrentTerm)) {
+                VotesCast.Add(requestedVoteCurrentTerm, serverRequesting);
+                SendVoteResponseTo(serverRequesting, requestedVoteCurrentTerm, true);
+            }
+        }
+    }
+
+    private void SendVoteResponseTo(Server serverRequesting, int requestedVoteCurrentTerm, bool voteGiven)
+    {
+        serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, voteGiven);
+    }
+
+    private void ReceiveVoteResponseFrom(Server server, int requestedVoteCurrentTerm, bool voteGiven)
+    {
+        if (voteGiven) { //potential bug: don't I need to also make sure that the vote is being 
+            if (!VotesReceived.Contains(server)) {
+                VotesReceived.Add(server);
+            }
+        }
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
