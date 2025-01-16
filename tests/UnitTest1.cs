@@ -182,4 +182,19 @@ public class UnitTest1
         //Assert
         Assert.Equal(States.Follower, candidate.State);
     }
+
+    //Testing #11
+    //Given a candidate server that just became a candidate, it votes for itself.
+    [Fact]
+    public void WhenServerBecomesCandidate_ThenVotesForItself() {
+        //Arrange
+        Server willBeCandidate = new();
+
+        //Act
+        willBeCandidate.StartElection();
+
+        //Assert
+        //I could check that its vote is written to a votes list
+        Assert.Contains(willBeCandidate, willBeCandidate.Votes);
+    }
 }

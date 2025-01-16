@@ -18,6 +18,7 @@ public class Server
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
+    public List<Server> Votes = new(); //If it has a Server in it, that means the server has voted for it with that current term.
 
     public Stopwatch timeSinceHearingFromLeader = new();
 
@@ -60,6 +61,11 @@ public class Server
         {
             AppendEntriesResponseLog.Add(requestNumber, accepted);
         }
+    }
+
+    public void StartElection()
+    {
+        this.Votes.Add(this);
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
