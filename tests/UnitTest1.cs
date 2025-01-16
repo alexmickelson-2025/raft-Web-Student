@@ -234,8 +234,8 @@ public class UnitTest1
         Assert.DoesNotContain(willSayYes, inLaterTerm.VotesReceived);
     }
 
-    //Testing #10
-    //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+    //Testing #14
+    //If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
     [Fact]
     public void IfAlreadyVoted_DontVoteThatTermAgain() {
         //Arrange
@@ -245,7 +245,7 @@ public class UnitTest1
         willSayNo.VotesCast.Add(2, someRandomServerWeVotedForInThatTerm);
         Server inLaterTerm = new();
         inLaterTerm.CurrentTerm = 2;
-        willSayNo.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
+        //willSayNo.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
 
         //Act
         inLaterTerm.SendRequestForVoteRPCTo(willSayNo); //I may also have a bug where I think I append the wrong "vote term" to the log
