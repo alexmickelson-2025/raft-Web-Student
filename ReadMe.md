@@ -25,9 +25,9 @@
 19) ~~When a candidate wins an election, it immediately sends a heart beat.~~
 
 Web Simulation Rubric Checklist:
-- [] Visualization of the timeout
-- [x] Current state of each node (i.e. follower, candidate, or leader)
-- [] Current election term of the node
+[ ] Visualization of the timeout
+[x] Current state of each node (i.e. follower, candidate, or leader)
+- [ ] Current election term of the node
 - [] For each node, which node they think is the current leader (or themselves if they are a candidate)
 - [] Slider for simulated network delay
 - [] Slider for simulated election timeout multiplier
