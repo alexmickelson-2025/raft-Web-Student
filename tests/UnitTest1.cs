@@ -245,12 +245,35 @@ public class UnitTest1
         willSayNo.VotesCast.Add(2, someRandomServerWeVotedForInThatTerm);
         Server inLaterTerm = new();
         inLaterTerm.CurrentTerm = 2;
-        //willSayNo.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
 
         //Act
         inLaterTerm.SendRequestForVoteRPCTo(willSayNo); //I may also have a bug where I think I append the wrong "vote term" to the log
 
         //Assert
         Assert.DoesNotContain(willSayNo, inLaterTerm.VotesReceived);
+    }
+
+    //Testing #15
+    //If a node receives a second request for vote for a future term, it should vote for that node.
+    [Fact]
+    public void IfHaveAlreadyVoted_VoteForALaterTermRequestAgain()
+    {
+        //Arrange
+        Server willSayYes = new();
+        willSayYes.CurrentTerm = 1;
+        Server inLaterTerm = new();
+        inLaterTerm.CurrentTerm = 2;
+        willSayYes.VotesCast = new Dictionary<int, Server>(); //Perhaps I can create a CastVotes property, int = term number, Server = server voted for
+
+        Server evenLaterTerm = new();
+        evenLaterTerm.CurrentTerm = 3;
+
+        //Act
+        inLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+        evenLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+
+        //Assert
+        Assert.Contains(willSayYes, inLaterTerm.VotesReceived);
+        Assert.Contains(willSayYes, evenLaterTerm.VotesReceived);
     }
 }
