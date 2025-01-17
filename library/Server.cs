@@ -12,12 +12,17 @@ public enum States
 
 public class Server : IServer
 {
+
+    //public int Id = 0;
     public States State = States.Follower;
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public Server? RecognizedLeader { get; set; }
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
+    //int IServer.Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public int Id { get; set; }
+
     public List<IServer> OtherServersList = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>

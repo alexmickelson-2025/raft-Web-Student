@@ -22,7 +22,8 @@ Welcome to your new app.
 
 @foreach(var node in nodes) {
     <div>
-        @node.Id
+        @* @nodeId  My node doesn't actually have an id*@ 
+        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm</p>
     </div>
 }
 
@@ -33,24 +34,25 @@ Welcome to your new app.
     void startSimulation() {
         //he doesn't want references to the exact node because we want the abstraction through the simulation
         var node1 = new Server(true, true); //does this mean new Server in my code?
+        node1.Id = 1;
         var node2 = new Server(true, true);
+        node2.Id = 2;
         var node3 = new Server(true, true);
-        // var node2 = new Node([], 2); //Alex did this, I think in my code I call that server and my parameters are different.
-        // var node3 = new Node([], 3);
+        node3.Id = 3;
 
 
         //TODO: Next steps will be to change SimulationNode so it implements IServer instead of Server.
         //TODO: but first I'm going to need to make sure my IServer interface contains every funciton it needs
         //Or I could get my tests to pass first ...
-        // var simulation1 = new SimulationNode(node1);
-        // var simulation2 = new SimulationNOde(node2);
-        // var simulation3 = new SimulationNode(node3);
+        var simulation1 = new SimulationNode(node1);
+        var simulation2 = new SimulationNode(node2);
+        var simulation3 = new SimulationNode(node3);
 
-        // node1.OtherNodes = [simulation2, simulation3];
-        // node2.OtherNodes = [simulation1, simulation3];
-        // node3.OtherNodes = [simulation1, simulation2];
+        node1.OtherServersList = [simulation2, simulation3];
+        node2.OtherServersList = [simulation1, simulation3];
+        node3.OtherServersList = [simulation1, simulation2];
 
-        // nodes = [simulation1, simulation2, simulation3];
+        nodes = [simulation1, simulation2, simulation3];
     }
 
     public void stopSimulation() {

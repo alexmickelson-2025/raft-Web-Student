@@ -2,6 +2,7 @@
 {
     public interface IServer
     {
+        int Id { get; set; }
         int CurrentTerm { get; set; }
         int ElectionTimeout { get; set; }
         Server? RecognizedLeader { get; set; }
