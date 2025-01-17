@@ -364,7 +364,8 @@ public class UnitTest1
     {
         //Arrange
         bool TrackTimeSinceHearingFromLeader = true;
-        Server server = new(TrackTimeSinceHearingFromLeader);
+        bool TrackTimeAtWhichLeaderShouldSendHeartbeats = false;
+        Server server = new(TrackTimeSinceHearingFromLeader, TrackTimeAtWhichLeaderShouldSendHeartbeats);
         server.CurrentTerm = 10; //why is votess received 3?? for terms not in this test?? there shouldn't be.
 
         //For debug purposes
@@ -387,6 +388,52 @@ public class UnitTest1
         ****/
     }
 
+    //Testing #1
+    //When a leader is active it sends a heart beat within 50ms
+    [Fact]
+    public void WhenLeaderIsActive_SendsHeartbeatEvery50ms()
+    {
+        //Arrange
+        bool TrackTimeSinceHearingFromLeader = false;
+        bool TrackTimeAtWhichLeaderShouldSendHeartbeats = true;
+        Server winningElection = new Server(TrackTimeSinceHearingFromLeader, TrackTimeAtWhichLeaderShouldSendHeartbeats);
+        winningElection.State = States.Candidate;
+        winningElection.CurrentTerm = 2;
+        var receivesHeartbeat = Substitute.For<IServer>();
+        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat};
+
+        //Act
+        winningElection.State = States.Leader;
+        Thread.Sleep(51); //A heartbeat should have been sent at 50ms, so now we should see it
+
+        //Assert
+        receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
+
+    }
+
+    //Testing #1, I think both parameters for constructor could (should) be true at the same time and still pass, let's find out
+    //When a leader is active it sends a heart beat within 50ms
+    [Fact]
+    public void WhenLeaderIsActive_SendsHeartbeatEvery50ms_TryBothConstructors()
+    {
+        //Arrange
+        bool TrackTimeSinceHearingFromLeader = true;
+        bool TrackTimeAtWhichLeaderShouldSendHeartbeats = true;
+        Server winningElection = new Server(TrackTimeSinceHearingFromLeader, TrackTimeAtWhichLeaderShouldSendHeartbeats);
+        winningElection.State = States.Candidate;
+        winningElection.CurrentTerm = 2;
+        var receivesHeartbeat = Substitute.For<IServer>();
+        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat };
+
+        //Act
+        winningElection.State = States.Leader;
+        Thread.Sleep(51); //A heartbeat should have been sent at 50ms, so now we should see it
+
+        //Assert
+        receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
+
+    }
+
     //Testing #13
     // Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.
     [Fact]
@@ -405,4 +452,6 @@ public class UnitTest1
         //Assert
         Assert.Equal(States.Follower, willLose.State);
     }
+
+
 }

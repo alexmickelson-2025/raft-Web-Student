@@ -25,18 +25,25 @@ public class Server : IServer
     public List<Server> VotesReceived = new(); //If it has a Server in it, that means the server has voted for it with that current term.
 
     public Stopwatch timeSinceHearingFromLeader = new();
+    private Stopwatch timeSinceLastSentHeartbeatAsLeader = new();
+    public static readonly int IntervalAtWhichLeaderShouldSendHeartbeatsInMs = 50;
 
     public Server()
     {
 
     }
 
-    public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt)
+    public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
     {
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
             this.timeSinceHearingFromLeader.Start();
             new Thread(() => StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()) { IsBackground = true }.Start();
+        }
+        if (TrackTimeAtWhichLeaderShouldSendHeartbeats)
+        {
+            //TODO: One day, I think I could turn this from just listening for a leader state to just one "listen for all states" that combines them or starts the three different threads
+            new Thread(() => ListenForLeaderState()) { IsBackground =true }.Start();
         }
     }
 
@@ -173,6 +180,34 @@ public class Server : IServer
             }
         }
         // throw new NotImplementedException();
+    }
+
+    public void ListenForLeaderState()
+    {
+        //NOTE: this is for LEADER state
+        while(true)
+        {
+            if (this.State == States.Leader)
+            {
+                //EDGE case just in case
+                if (!timeSinceLastSentHeartbeatAsLeader.IsRunning)
+                {
+                    this.SendHeartbeatToAllNodes();
+                    timeSinceLastSentHeartbeatAsLeader.Start();
+                }
+                else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
+                {
+                    this.SendHeartbeatToAllNodes();
+                    timeSinceLastSentHeartbeatAsLeader.Restart();
+                }
+            }
+            else
+            {
+                Thread.Sleep(20); //picked an arbitrary number greater than 1 but still not high in case we become the leader. But also the moment we become the leader
+                //We send a heartbeat so I feel like we could wait 20 seconds to check 
+                //I just don't want to be checking each second because the odds we become leader and don't send a heartbeat are -- well -- it would mean we have a bug
+            }
+        }
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
