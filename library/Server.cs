@@ -26,6 +26,20 @@ public class Server : IServer
 
     public Stopwatch timeSinceHearingFromLeader = new();
 
+    public Server()
+    {
+
+    }
+
+    public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt)
+    {
+        if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
+            this.ResetElectionTimeout();
+            this.timeSinceHearingFromLeader.Start();
+            new Thread(() => StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()) { IsBackground = true }.Start();
+        }
+    }
+
     public void ResetElectionTimeout()
     {
         int val = (Random.Shared.Next() % 150) + 150;
@@ -71,6 +85,7 @@ public class Server : IServer
     {
         this.VotesReceived.Add(this);
         this.State = States.Candidate;
+        this.CurrentTerm++;
         //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
         //new Thread(() => NameOfYourMethod()) { IsBackground = true }.Start();
         new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()) { IsBackground = true }.Start();
@@ -136,6 +151,28 @@ public class Server : IServer
             }
         }
        // throw new NotImplementedException();
+    }
+
+    public void StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()
+    {
+        //NOTE: this is for FOLLOWER state and for time since we received communication and has NOTHING to do with being a candidate in an election
+       
+        //do I want the same stopwatch as the one I use to monitor if I haven't heard from the leader  yet? But that's what resetting the state when I get a message from the leader does.
+        //Otherwise I worry that maybe we'll keep trying to start an election all over again
+        while (true)
+        {
+            //Hypothesis: Perhaps the 
+            if (this.State == States.Follower && timeSinceHearingFromLeader.ElapsedMilliseconds > this.ElectionTimeout)
+            {
+                Console.WriteLine($"haven't heard from the leader in {this.timeSinceHearingFromLeader.ElapsedMilliseconds}, which is more than the election timeout of {this.ElectionTimeout}, starting election now");
+                StartElection();
+            }
+            else
+            {
+                Thread.Sleep(1);
+            }
+        }
+        // throw new NotImplementedException();
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)

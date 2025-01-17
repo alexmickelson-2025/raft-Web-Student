@@ -313,7 +313,7 @@ public class UnitTest1
     //    alreadyVotedOne.VotesCast.Add(2, discard);
     //    discard.VotesCast.Add(2, alreadyVotedOne);  //at this point we've set up a tie. each of them voted for each other in term 2 so when candidate tries to start an election it wont get the votes
     //    candidate.OtherServersList = new List<IServer> { discard , alreadyVotedOne};
-        
+
     //    //Act
     //    candidate.StartElection(); //now its current term will be 2, so it will not get the votes.
     //    var sleepTime = candidate.ElectionTimeout;
@@ -324,4 +324,34 @@ public class UnitTest1
     //    Assert.True(candidate.CurrentTerm > 2); //Logically current term should be 3 but that's per our implementation, we know it had better be greater than 2 though if it started a new one
     //    Assert.Contains(candidate, candidate.VotesReceived); //Because it should have voted for itself that new election
     //}
+
+    //Testing #6
+    //When a new election begins, the term is incremented by 1.
+    [Fact]
+    public void WhenNewElectionBegins_ThenTermImcremented()
+    {
+        //Arrange
+        bool TrackTimeSinceHearingFromLeader = true;
+        Server server = new(TrackTimeSinceHearingFromLeader);
+        server.CurrentTerm = 10; //why is votess received 3?? for terms not in this test?? there shouldn't be.
+
+        //For debug purposes
+        int electionTimeout = server.ElectionTimeout;
+
+        //Act
+        Thread.Sleep(301); //A new election should have begin by now, if not two
+        //I can tell that my election has started, because I changed to candidate state (instead of follower) but I think once I'm in candidate state I need to break out of my "election loop" when I hear from the leader
+        //So perhaps I need to incorporate the time heard from leader variable into that.
+        int laterElectionTimeout = server.ElectionTimeout;
+
+        //Assert
+        Assert.True(server.CurrentTerm > 10);
+
+        /******
+        //TODO: Bugs/flaws this test reveals when I look at it in the debugger:
+        * First, VotesReceived, I think, needs to be tied to a current term
+        * Second, when I started an election, I didn't actually vote for myself
+        * Third, when I started an election, I didn't reset the election timeout
+        ****/
+    }
 }
