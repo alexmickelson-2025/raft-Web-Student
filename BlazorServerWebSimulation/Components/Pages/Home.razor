@@ -23,7 +23,7 @@ Welcome to your new app.
 @foreach(var node in nodes) {
     <div>
         @* @nodeId  My node doesn't actually have an id*@ 
-        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm and its curren state is @node.State</p>
+        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm and its current state is @node.State</p>
     </div>
 }
 
@@ -53,6 +53,11 @@ Welcome to your new app.
         node3.OtherServersList = [simulation1, simulation2];
 
         nodes = [simulation1, simulation2, simulation3];
+        
+       var timer = new Timer(_ =>
+       {
+           InvokeAsync(StateHasChanged);
+       }, null, 0, 200);
     }
 
     public void stopSimulation() {
