@@ -158,6 +158,8 @@ public class Server : IServer
             }
 
             //TODO: fix this
+            //Note: I think my other two tests might need to just each have at least one other node in their cluster, and that would automatically stop them from breaking
+            //because then they wouldn't instantly be winnign the election.
             //THis right here is the code that was breaking the other two tests. I think it's because 
             //else if (haveMajorityOfVotes())
             //{
