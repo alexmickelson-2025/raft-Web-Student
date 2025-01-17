@@ -70,6 +70,10 @@ public class Server : IServer
     public void StartElection()
     {
         this.VotesReceived.Add(this);
+        this.State = States.Candidate;
+        //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
+        //new Thread(() => NameOfYourMethod()) { IsBackground = true }.Start();
+        new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()) { IsBackground = true }.Start();
     }
 
     public void SendRequestForVoteRPCTo(Server server)
@@ -117,6 +121,21 @@ public class Server : IServer
     public void WinElection()
     {
         this.SendHeartbeatToAllNodes();
+    }
+
+    public void StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew(); //do I want the same stopwatch as the one I use to monitor if I haven't heard from the leader  yet?
+        //Otherwise I worry that maybe we'll keep trying to start an election all over again
+        while (this.State == States.Candidate)
+        {
+            if (stopwatch.ElapsedMilliseconds > this.ElectionTimeout)
+            {
+                StartElection();
+                break;
+            }
+        }
+       // throw new NotImplementedException();
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)

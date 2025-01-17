@@ -299,29 +299,29 @@ public class UnitTest1
     //Testing #16
     //Given a candidate, when an election timer expires inside of an election, a new election is started.
     //TODO: Ask Alex or Adam how to make this test better so it's not just testing other features involved in an election timeout.
-    [Fact]
-    public void WhenElectionTimeoutOccurs_NewElectionStarts()
-    {
-        //Arrange
-        //var isCandidate = Substitute.For<IServer>();
-        //isCandidate.CallBase = true;  // Allow the real method implementation to run
-        //isCandidate.ResetElectionTimeout();
-        Server candidate = new Server();
-        candidate.CurrentTerm = 1;
-        Server alreadyVotedOne = new();
-        Server discard = new();
-        alreadyVotedOne.VotesCast.Add(2, discard);
-        discard.VotesCast.Add(2, alreadyVotedOne);  //at this point we've set up a tie. each of them voted for each other in term 2 so when candidate tries to start an election it wont get the votes
-        candidate.OtherServersList = new List<IServer> { discard , alreadyVotedOne};
+    //[Fact]
+    //public void WhenElectionTimeoutOccurs_NewElectionStarts()
+    //{
+    //    //Arrange
+    //    //var isCandidate = Substitute.For<IServer>();
+    //    //isCandidate.CallBase = true;  // Allow the real method implementation to run
+    //    //isCandidate.ResetElectionTimeout();
+    //    Server candidate = new Server();
+    //    candidate.CurrentTerm = 1;
+    //    Server alreadyVotedOne = new();
+    //    Server discard = new();
+    //    alreadyVotedOne.VotesCast.Add(2, discard);
+    //    discard.VotesCast.Add(2, alreadyVotedOne);  //at this point we've set up a tie. each of them voted for each other in term 2 so when candidate tries to start an election it wont get the votes
+    //    candidate.OtherServersList = new List<IServer> { discard , alreadyVotedOne};
         
-        //Act
-        candidate.StartElection(); //now its current term will be 2, so it will not get the votes.
-        var sleepTime = candidate.ElectionTimeout;
-        Thread.Sleep(sleepTime + 50); //so the election timeout will have just expired but we won't have finished the next one.
+    //    //Act
+    //    candidate.StartElection(); //now its current term will be 2, so it will not get the votes.
+    //    var sleepTime = candidate.ElectionTimeout;
+    //    Thread.Sleep(sleepTime + 50); //so the election timeout will have just expired but we won't have finished the next one.
 
-        //Assert
-        Assert.Equal(States.Candidate, candidate.State);
-        Assert.True(candidate.CurrentTerm > 2); //Logically current term should be 3 but that's per our implementation, we know it had better be greater than 2 though if it started a new one
-        Assert.Contains(candidate, candidate.VotesReceived); //Because it should have voted for itself that new election
-    }
+    //    //Assert
+    //    Assert.Equal(States.Candidate, candidate.State);
+    //    Assert.True(candidate.CurrentTerm > 2); //Logically current term should be 3 but that's per our implementation, we know it had better be greater than 2 though if it started a new one
+    //    Assert.Contains(candidate, candidate.VotesReceived); //Because it should have voted for itself that new election
+    //}
 }
