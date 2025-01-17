@@ -19,7 +19,7 @@
 13) Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.
 14) ~~If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)~~
 15) ~~If a node receives a second request for vote for a future term, it should vote for that node.~~
-16) Given a candidate, when an election timer expires inside of an election, a new election is started. --NOTE: ALMOST DONE just need to implement test 6 first.
+16) ~~Given a candidate, when an election timer expires inside of an election, a new election is started.~~ --NOTE: ALMOST DONE just need to implement test 6 first.
 17) ~~When a follower node receives an AppendEntries request, it sends a response.~~
 18) ~~Given a candidate receives an AppendEntries from a previous term, then rejects.~~
 19) ~~When a candidate wins an election, it immediately sends a heart beat.~~
