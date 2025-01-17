@@ -20,10 +20,16 @@ else
 Welcome to your new app.
 <button @onclick="startSimulation">start</button>
 
+@* //the sliders come from his label for="speed" election tmeout between code *@
+
 @foreach(var node in nodes) {
-    <div>
-        @* @nodeId  My node doesn't actually have an id*@ 
-        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm and its current state is @node.State</p>
+    <div class="p-3 col-4">
+        <div class="border p-3 rounded">
+            <p>Node @node.Id</p>
+            <p>Term @node.CurrentTerm</p>
+            <p>State @node.State</p>
+            <p>Current leader @node?.RecognizedLeader?.Id ?? was null</p>
+        </div>
     </div>
 }
 
