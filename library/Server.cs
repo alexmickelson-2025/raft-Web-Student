@@ -156,8 +156,33 @@ public class Server : IServer
                 StartElection();
                 break;
             }
+
+            //TODO: fix this
+            //THis right here is the code that was breaking the other two tests. I think it's because 
+            //else if (haveMajorityOfVotes())
+            //{
+            //    //We won the election, so we need to start the right timers
+            //    this.State = States.Leader;
+            //    //this.SendHeartbeatToAllNodes(); //I want to put this in, but I have a test for it passing elsewhere, so I want to check on that.
+            //    //this.timeSinceLastSentHeartbeatAsLeader.Reset();
+            //    break;
+            //}
         }
        // throw new NotImplementedException();
+    }
+
+    private bool haveMajorityOfVotes()
+    {
+        if (this.OtherServersList.Count == 0)
+        {
+            //We are the only node in the server!! return true (and also worry a lot)
+            return true;
+        }
+        else
+        {
+            //Will be implemented in more complicated test scenario. I think I'm going to need to use another thread to just say wait and keep checking everyone whose voted for us this term
+            throw new NotImplementedException();
+        }
     }
 
     public void StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()

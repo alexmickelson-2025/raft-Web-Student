@@ -62,7 +62,7 @@ public class UnitTest1
     public void WhenElectionTimeReset_ValueIsTrulyRandom() {
         //Arrange
         Server testServer = new();
-        Dictionary<int,int> countAppears = new();
+        Dictionary<int, int> countAppears = new();
 
         //Act
         for (int i = 0; i < 100; i++) {
@@ -129,7 +129,7 @@ public class UnitTest1
     public void WhenReceivesAppendEntriesFromPreviousTerm_ThenRejects()
     {
         //Arrange
-        Server follower = new ();
+        Server follower = new();
         Server leader = new();
         follower.CurrentTerm = 2;
 
@@ -159,7 +159,7 @@ public class UnitTest1
         //Assert
         //I do less than 40 because it may take some time to reset it but it certainly won't be 300 like it was before
         var time = follower.timeSinceHearingFromLeader.ElapsedMilliseconds;
-        Assert.True(follower.timeSinceHearingFromLeader.ElapsedMilliseconds >= 0 && follower.timeSinceHearingFromLeader.ElapsedMilliseconds < 40); 
+        Assert.True(follower.timeSinceHearingFromLeader.ElapsedMilliseconds >= 0 && follower.timeSinceHearingFromLeader.ElapsedMilliseconds < 40);
         //Idea for the future we could also ensure the reset timer function was called.
         //I could also wrap the stopwatch in a class that would be easier to mock out. I think that actually would be a better way to test it??
     }
@@ -287,7 +287,7 @@ public class UnitTest1
         Server winningElection = new();
         winningElection.CurrentTerm = 1;
         var receivesHeartbeat = Substitute.For<IServer>();
-        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat};
+        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat };
 
         //Act
         winningElection.WinElection();
@@ -400,7 +400,7 @@ public class UnitTest1
         winningElection.State = States.Candidate;
         winningElection.CurrentTerm = 2;
         var receivesHeartbeat = Substitute.For<IServer>();
-        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat};
+        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat };
 
         //Act
         winningElection.State = States.Leader;
@@ -453,6 +453,24 @@ public class UnitTest1
         Assert.Equal(States.Follower, willLose.State);
     }
 
+    //Testing #8
+    //Given an election begins, when the candidate gets a majority of votes, it becomes a leader.
+    [Fact]
+    public void CandidateGetsMajorityOfVotes_AsOnlyServer_ThusBecomesLeader()
+    {
+        //Arrange
+        Server onlyServerInCluser = new(true, true);
+        onlyServerInCluser.State = States.Follower;
+        onlyServerInCluser.OtherServersList = new List<IServer>();
+
+        //Act
+        onlyServerInCluser.StartElection();
+        Thread.Sleep(15); //Not long enough for another election to start but ample time to ensure we finished voting for ourselves.
+
+        //Assert
+        Assert.Equal(States.Leader, onlyServerInCluser.State);
+    }
+
     //Testing #4
     //When a follower doesn't get a message for 300ms then it starts an election.
     [Fact]
@@ -466,6 +484,8 @@ public class UnitTest1
         Thread.Sleep(301); //thus it will get no message
 
         //Assert
-        Assert.True(allByItself.State == States.Candidate);
+        Assert.True(allByItself.State == States.Candidate || allByItself.State== States.Leader);
     }
+
+
 }
