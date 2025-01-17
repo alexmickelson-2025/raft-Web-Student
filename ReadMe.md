@@ -22,4 +22,4 @@
 16) Given a candidate, when an election timer expires inside of an election, a new election is started.
 17) ~~When a follower node receives an AppendEntries request, it sends a response.~~
 18) ~~Given a candidate receives an AppendEntries from a previous term, then rejects.~~
-19) When a candidate wins an election, it immediately sends a heart beat.
+19) ~~When a candidate wins an election, it immediately sends a heart beat.~~
