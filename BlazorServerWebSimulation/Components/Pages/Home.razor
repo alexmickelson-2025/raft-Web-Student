@@ -23,7 +23,7 @@ Welcome to your new app.
 @foreach(var node in nodes) {
     <div>
         @* @nodeId  My node doesn't actually have an id*@ 
-        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm</p>
+        <p>Here is a node with Id @node.Id . it's on term @node.CurrentTerm and its curren state is @node.State</p>
     </div>
 }
 

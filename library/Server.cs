@@ -12,16 +12,15 @@ public enum States
 
 public class Server : IServer
 {
-
     //public int Id = 0;
-    public States State = States.Follower;
+    public States State { get; set; }
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public Server? RecognizedLeader { get; set; }
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
-    //int IServer.Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public int Id { get; set; }
+    //IServer.State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public List<IServer> OtherServersList = new();
 
@@ -35,11 +34,12 @@ public class Server : IServer
 
     public Server()
     {
-
+        this.State = States.Follower;
     }
 
     public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
     {
+        this.State = States.Follower;
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
             this.timeSinceHearingFromLeader.Start();
