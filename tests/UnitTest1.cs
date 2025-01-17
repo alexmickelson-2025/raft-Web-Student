@@ -453,5 +453,19 @@ public class UnitTest1
         Assert.Equal(States.Follower, willLose.State);
     }
 
+    //Testing #4
+    //When a follower doesn't get a message for 300ms then it starts an election.
+    [Fact]
+    public void WhenFollowerGetsNoMessageIn300ms_ThenStartsElection()
+    {
+        //Arrange
+        Server allByItself = new(true, true);
+        allByItself.State = States.Follower; //this should be a given but just in case
 
+        //Act
+        Thread.Sleep(301); //thus it will get no message
+
+        //Assert
+        Assert.True(allByItself.State == States.Candidate);
+    }
 }
