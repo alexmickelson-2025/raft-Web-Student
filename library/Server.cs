@@ -10,14 +10,16 @@ public enum States
     Leader
 };
 
-public class Server
+public class Server : IServer
 {
-    public States State = States.Follower; 
+    public States State = States.Follower;
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
-    public Server? RecognizedLeader {get;set;}
+    public Server? RecognizedLeader { get; set; }
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
+    public List<IServer> OtherServersList = new();
+
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
     public List<Server> VotesReceived = new(); //If it has a Server in it, that means the server has voted for it with that current term.
@@ -78,8 +80,10 @@ public class Server
     //The reason we pass the requestedVote current term (even though it's a property on the server requesting) is the server requesting might update its term after we receive it, so we can't trust that property and must specify it
     private void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
-        if (requestedVoteCurrentTerm > this.CurrentTerm) {
-            if(!VotesCast.ContainsKey(requestedVoteCurrentTerm)) {
+        if (requestedVoteCurrentTerm > this.CurrentTerm)
+        {
+            if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))
+            {
                 VotesCast.Add(requestedVoteCurrentTerm, serverRequesting);
                 SendVoteResponseTo(serverRequesting, requestedVoteCurrentTerm, true);
             }
@@ -93,11 +97,26 @@ public class Server
 
     private void ReceiveVoteResponseFrom(Server server, int requestedVoteCurrentTerm, bool voteGiven)
     {
-        if (voteGiven) { //potential bug: don't I need to also make sure that the vote is being 
-            if (!VotesReceived.Contains(server)) {
+        if (voteGiven)
+        { //potential bug: don't I need to also make sure that the vote is being 
+            if (!VotesReceived.Contains(server))
+            {
                 VotesReceived.Add(server);
             }
         }
+    }
+
+    public void SendHeartbeatToAllNodes()
+    {
+        foreach (var server in OtherServersList)
+        {
+            server.ReceiveAppendEntriesLogFrom(this, 1, this.CurrentTerm);
+        }
+    }
+
+    public void WinElection()
+    {
+        this.SendHeartbeatToAllNodes();
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)

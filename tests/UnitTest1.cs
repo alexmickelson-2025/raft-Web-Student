@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using NSubstitute;
 
 namespace tests;
 
@@ -275,5 +276,25 @@ public class UnitTest1
         //Assert
         Assert.Contains(willSayYes, inLaterTerm.VotesReceived);
         Assert.Contains(willSayYes, evenLaterTerm.VotesReceived);
+    }
+
+    //Testing #19
+    //When a candidate wins an election, it immediately sends a heart beat
+    [Fact]
+    public void UponWinningElection_ThenLeaderSendsHeartbeatEmptyAppendEntriesRPC()
+    {
+        //Arrange
+        Server winningElection = new();
+        winningElection.CurrentTerm = 1;
+        var receivesHeartbeat = Substitute.For<IServer>();
+        winningElection.OtherServersList = new List<IServer>() { receivesHeartbeat};
+
+        //Act
+        winningElection.WinElection();
+
+        //Assert
+        receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 1);
+
+        //
     }
 }
