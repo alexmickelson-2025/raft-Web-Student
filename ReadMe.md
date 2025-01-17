@@ -16,7 +16,7 @@
 10) ~~A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)~~
 11) ~~Given a candidate server that just became a candidate, it votes for itself.~~
 12) ~~Given a candidate, when it receives an AppendEntries message from a node with a later term, then candidate loses and becomes a follower.~~
-13) Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.
+13) ~~Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.~~
 14) ~~If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)~~
 15) ~~If a node receives a second request for vote for a future term, it should vote for that node.~~
 16) ~~Given a candidate, when an election timer expires inside of an election, a new election is started.~~ --NOTE: ALMOST DONE just need to implement test 6 first.

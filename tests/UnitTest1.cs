@@ -380,10 +380,29 @@ public class UnitTest1
         Assert.True(server.CurrentTerm > 10);
 
         /******
-        //TODO: Bugs/flaws this test reveals when I look at it in the debugger:
+        //TODO: Bugs/flaws/NotYetImplementeds this test reveals when I look at it in the debugger:
         * First, VotesReceived, I think, needs to be tied to a current term
         * Second, when I started an election, I didn't actually vote for myself
         * Third, when I started an election, I didn't reset the election timeout
         ****/
+    }
+
+    //Testing #13
+    // Given a candidate, when it receives an AppendEntries message from a node with an equal term, then candidate loses and becomes a follower.
+    [Fact]
+    public void WhenCandidateReceivesAppendEntriesMessage_AndNodeHasEqualTerm_ThenCandidateLosesElectionAndBecomesFollower()
+    {
+        //Arrange
+        Server willLose = new();
+        willLose.CurrentTerm = 3;
+        willLose.State = States.Candidate;
+        Server alreadyLeader = new();
+        alreadyLeader.CurrentTerm = 3;
+
+        //Act
+        willLose.ReceiveAppendEntriesLogFrom(alreadyLeader, 100, alreadyLeader.CurrentTerm); //because the leader has the same term we must forfeit the election
+
+        //Assert
+        Assert.Equal(States.Follower, willLose.State);
     }
 }
