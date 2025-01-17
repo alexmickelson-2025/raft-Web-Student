@@ -1,11 +1,22 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using Simulation
+@using library
+@* @implements IDisposable *@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-@* 
+<h1>Raft Simulation</h1>
+
+@if (!isRunning)
+{
+    <button class="btn btn-primary" @onclick="startSimulation">Start Simulation</button>
+}
+else
+{
+    <button class="btn btn-danger" @onclick ="stopSimulation"> Stop Simulation </button >
+}
+
 Welcome to your new app.
 <button @onclick="startSimulation">start</button>
 
@@ -16,22 +27,33 @@ Welcome to your new app.
 }
 
 @code {
+    Boolean isRunning = false;
     List<SimulationNode>? nodes = [];
 
     void startSimulation() {
         //he doesn't want references to the exact node because we want the abstraction through the simulation
-        var node1 = new Node([], 1); //does this mean new Server in my code?
-        var node2 = new Node([], 2);
-        var node3 = new Node([], 3);
+        var node1 = new Server(true, true); //does this mean new Server in my code?
+        var node2 = new Server(true, true);
+        var node3 = new Server(true, true);
+        // var node2 = new Node([], 2); //Alex did this, I think in my code I call that server and my parameters are different.
+        // var node3 = new Node([], 3);
 
-        var simulation1 = new SimulationNode(node1);
-        var simulation2 = new SimulationNOde(node2);
-        var simulation3 = new SimulationNode(node3);
 
-        node1.OtherNodes = [simulation2, simulation3];
-        node2.OtherNodes = [simulation1, simulation3];
-        node3.OtherNodes = [simulation1, simulation2];
+        //TODO: Next steps will be to change SimulationNode so it implements IServer instead of Server.
+        //TODO: but first I'm going to need to make sure my IServer interface contains every funciton it needs
+        //Or I could get my tests to pass first ...
+        // var simulation1 = new SimulationNode(node1);
+        // var simulation2 = new SimulationNOde(node2);
+        // var simulation3 = new SimulationNode(node3);
 
-        nodes = [simulation1, simulation2, simulation3]
+        // node1.OtherNodes = [simulation2, simulation3];
+        // node2.OtherNodes = [simulation1, simulation3];
+        // node3.OtherNodes = [simulation1, simulation2];
+
+        // nodes = [simulation1, simulation2, simulation3];
     }
-} *@
+
+    public void stopSimulation() {
+
+    }
+}
