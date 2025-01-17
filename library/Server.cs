@@ -101,6 +101,7 @@ public class Server : IServer
         //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
         //new Thread(() => NameOfYourMethod()) { IsBackground = true }.Start();
         new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()) { IsBackground = true }.Start();
+        new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()) { IsBackground = true }.Start(); //Did we win?
     }
 
     public void SendRequestForVoteRPCTo(Server server)
@@ -148,6 +149,9 @@ public class Server : IServer
     public void WinElection()
     {
         this.SendHeartbeatToAllNodes();
+        this.State = States.Leader;
+        //TODO: is this what we want to do? setting recognized leader to null??
+        this.RecognizedLeader = null;
     }
 
     public void StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()
@@ -178,18 +182,51 @@ public class Server : IServer
        // throw new NotImplementedException();
     }
 
+    public void StartBackgroundTaskToDetermineIfWeJustWonAnElection()
+    {
+        while(true)
+        {
+            if (State == States.Candidate)
+            {
+                if (haveMajorityOfVotes())
+                {
+                    WinElection();
+                }
+                else
+                {
+                    Thread.Sleep(1); //Wait just a milisecond to see if we get another vote
+                }
+                
+            }
+            else
+            {
+                break; //we aren't a candidate, so let the thread die. We'll start it again in StartElection();
+                //Thread.Sleep(5); //Wait about 5 miliseconds then just check if we became a candidate or not.
+            }
+        }
+    }
+
     private bool haveMajorityOfVotes()
     {
-        if (this.OtherServersList.Count == 0)
+        //TODO: once I'm connfident this works, refactor to just return the if block.
+        if (this.VotesReceived.Count >= (OtherServersList.Count / 2 + 1))
         {
-            //We are the only node in the server!! return true (and also worry a lot)
             return true;
         }
         else
         {
-            //Will be implemented in more complicated test scenario. I think I'm going to need to use another thread to just say wait and keep checking everyone whose voted for us this term
-            throw new NotImplementedException();
+            return false;
         }
+        //if (this.OtherServersList.Count == 0)
+        //{
+        //    //We are the only node in the server!! return true (and also worry a lot)
+        //    return true;
+        //}
+        //else
+        //{
+        //    //Will be implemented in more complicated test scenario. I think I'm going to need to use another thread to just say wait and keep checking everyone whose voted for us this term
+        //    throw new NotImplementedException();
+        //}
     }
 
     public void StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()
