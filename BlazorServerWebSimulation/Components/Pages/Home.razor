@@ -17,13 +17,10 @@ else
     <button class="btn btn-danger" @onclick ="stopSimulation"> Stop Simulation </button >
 }
 
-Welcome to your new app.
-<button @onclick="startSimulation">start</button>
-
 @* //the sliders come from his label for="speed" election tmeout between code *@
 
 @foreach(var node in nodes) {
-    <div class="p-3 col-4">
+    <div class="p-3 col-4 row">
         <div class="border p-3 rounded">
             <p>Node @node.Id</p>
             <p>Term @node.CurrentTerm</p>
@@ -32,6 +29,21 @@ Welcome to your new app.
         </div>
     </div>
 }
+
+<div class= "row">
+  <div class= "col">
+    <div>
+     @*  < label for= "speed" >
+        Election timeout between @(FormatMilliSeconds(150 * SimulationNode.NodeIntervalScalar)) and @(FormatMilliSeconds(300 *
+        SimulationNode.NodeIntervalScalar)) seconds
+
+
+        < input type = "range" id = "speed" name = "speed" min = "1" max = "150" @bind:event= "oninput"
+          @bind = RaftNode.NodeIntervalScalar @onchange = UpdateTimer />
+      </ label > *@
+    </div>
+  </div>
+</div>
 
 @code {
     Boolean isRunning = false;
@@ -68,5 +80,10 @@ Welcome to your new app.
 
     public void stopSimulation() {
 
+    }
+
+    public static string FormatMilliSeconds(double milliSeconds)
+    {
+        return $"{milliSeconds / 1000.0:F1}";
     }
 }
