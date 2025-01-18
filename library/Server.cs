@@ -12,7 +12,6 @@ public enum States
 
 public class Server : IServer
 {
-    //public int Id = 0;
     public States State { get; set; }
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public Server? RecognizedLeader { get; set; }
@@ -20,7 +19,8 @@ public class Server : IServer
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
     public int Id { get; set; }
-    //IServer.State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public int ElectionTimeoutAdjustmentFactor { get; set; } //default value of 1
 
     public List<IServer> OtherServersList = new();
 
@@ -34,11 +34,13 @@ public class Server : IServer
 
     public Server()
     {
+        ElectionTimeoutAdjustmentFactor = 1;
         this.State = States.Follower;
     }
 
     public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
     {
+        ElectionTimeoutAdjustmentFactor = 1;
         this.State = States.Follower;
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
@@ -55,7 +57,7 @@ public class Server : IServer
     public void ResetElectionTimeout()
     {
         int val = (Random.Shared.Next() % 150) + 150;
-        ElectionTimeout = val;
+        ElectionTimeout = val * ElectionTimeoutAdjustmentFactor;
     }
 
     public void SendAppendEntriesLogTo(Server follower)

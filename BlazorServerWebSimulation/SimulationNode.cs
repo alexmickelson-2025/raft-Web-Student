@@ -15,6 +15,7 @@ public class SimulationNode: IServer {
     public int ElectionTimeout { get => ((IServer)InnerNode).ElectionTimeout; set => ((IServer)InnerNode).ElectionTimeout = value; }
     public Server? RecognizedLeader { get => ((IServer)InnerNode).RecognizedLeader; set => ((IServer)InnerNode).RecognizedLeader = value; }
     public States State { get => ((IServer)InnerNode).State; set => ((IServer)InnerNode).State = value; }
+    public int ElectionTimeoutAdjustmentFactor { get => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor; set => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor = value; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {

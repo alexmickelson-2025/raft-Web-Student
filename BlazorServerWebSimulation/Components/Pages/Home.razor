@@ -26,30 +26,32 @@ else
             <p>Term @node.CurrentTerm</p>
             <p>State @node.State</p>
             <p>Current leader @node?.RecognizedLeader?.Id</p>
+            <p>Election Timeout @node?.ElectionTimeout miliseconds</p>
         </div>
     </div>
 }
 
 <div class= "row">
-  <div class= "col">
-    <div>
-     @*  < label for= "speed" >
-        Election timeout between @(FormatMilliSeconds(150 * SimulationNode.NodeIntervalScalar)) and @(FormatMilliSeconds(300 *
-        SimulationNode.NodeIntervalScalar)) seconds
+    <div class= "col">
+        <div>
+            <label for= "speed">
+                Election timeout between @(FormatMilliSeconds(150 * ElectionTimeoutAdjustment)) and 
+                @(FormatMilliSeconds(300 * ElectionTimeoutAdjustment)) seconds 
+            </label>
 
-
-        < input type = "range" id = "speed" name = "speed" min = "1" max = "150" @bind:event= "oninput"
-          @bind = RaftNode.NodeIntervalScalar @onchange = UpdateTimer />
-      </ label > *@
+            <input type="range" id="speed" name ="speed" min="1" max ="150"
+            @bind-value=ElectionTimeoutAdjustment @oninput="UpdateElectionTimeouts"/>
+        </div>
     </div>
-  </div>
 </div>
 
 @code {
     Boolean isRunning = false;
+    int ElectionTimeoutAdjustment { get; set; }
     List<SimulationNode>? nodes = [];
 
     void startSimulation() {
+        isRunning = true;
         //he doesn't want references to the exact node because we want the abstraction through the simulation
         var node1 = new Server(true, true); //does this mean new Server in my code?
         node1.Id = 1;
@@ -71,11 +73,11 @@ else
         node3.OtherServersList = [simulation1, simulation2];
 
         nodes = [simulation1, simulation2, simulation3];
-        
-       var timer = new Timer(_ =>
-       {
-           InvokeAsync(StateHasChanged);
-       }, null, 0, 200);
+
+        var timer = new Timer(_ =>
+        {
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 200);
     }
 
     public void stopSimulation() {
@@ -85,5 +87,15 @@ else
     public static string FormatMilliSeconds(double milliSeconds)
     {
         return $"{milliSeconds / 1000.0:F1}";
+    }
+
+    public void UpdateElectionTimeouts() {
+        if (nodes is null) {
+            throw new Exception("nodes (simulation) should not have been null!! Exception thrown from UpdateElectionTimeouts function");
+        }
+        foreach (var simulation in nodes) {
+            simulation.ElectionTimeoutAdjustmentFactor = this.ElectionTimeoutAdjustment;
+            simulation.ResetElectionTimeout();
+        }
     }
 }

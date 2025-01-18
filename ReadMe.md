@@ -30,4 +30,4 @@ Web Simulation Rubric Checklist:
 - [x] Current election term of the node
 - [ ] For each node, which node they think is the current leader (or themselves if they are a candidate)
 - [ ] Slider for simulated network delay
-- [ ] Slider for simulated election timeout multiplier
+- [x] Slider for simulated election timeout multiplier

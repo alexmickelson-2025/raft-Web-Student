@@ -6,6 +6,8 @@
         public States State { get; set; }
         int CurrentTerm { get; set; }
         int ElectionTimeout { get; set; }
+
+        public int ElectionTimeoutAdjustmentFactor { get; set; }
         Server? RecognizedLeader { get; set; }
 
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm);
