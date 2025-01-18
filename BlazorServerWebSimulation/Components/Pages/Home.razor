@@ -44,10 +44,23 @@ else
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col">
+        <div>
+            <label for="network">
+                Network Delay @(FormatMilliSeconds(NetworkDelay)) seconds
+            </label>
+
+            <input type="range" id="network" name="speed" min="0" max="15000000"
+            @bind-value=NetworkDelay @oninput="UpdateNetworkDelay" />
+        </div>
+    </div>
+</div>
 
 @code {
     Boolean isRunning = false;
     int ElectionTimeoutAdjustment { get; set; }
+    int NetworkDelay { get; set; }
     List<SimulationNode>? nodes = [];
 
     void startSimulation() {
@@ -95,6 +108,19 @@ else
         }
         foreach (var simulation in nodes) {
             simulation.ElectionTimeoutAdjustmentFactor = this.ElectionTimeoutAdjustment;
+            simulation.ResetElectionTimeout();
+        }
+    }
+
+    public void UpdateNetworkDelay()
+    {
+        if (nodes is null)
+        {
+            throw new Exception("nodes (simulation) should not have been null!! Exception thrown from UpdateElectionTimeouts function");
+        }
+        foreach (var simulation in nodes)
+        {
+            simulation.NetworkDelay = this.NetworkDelay;
             simulation.ResetElectionTimeout();
         }
     }
