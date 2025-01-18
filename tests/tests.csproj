@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlazorServerWebSimulation\BlazorServerWebSimulation.csproj" />
     <ProjectReference Include="..\library\library.csproj" />
   </ItemGroup>
 

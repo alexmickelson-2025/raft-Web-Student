@@ -4,10 +4,11 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using NSubstitute;
+using Simulation;
 
 namespace tests;
 
-public class UnitTest1
+public class ServerTests
 {
     ////Unit test 1
     //[Fact]
@@ -46,7 +47,8 @@ public class UnitTest1
     //Testing #5 
     // When the election time is reset, it is a random value between 150 and 300ms.
     [Fact]
-    public void WhenElectionTimeReset_ItIsBetween150And300ms() {
+    public void WhenElectionTimeReset_ItIsBetween150And300ms()
+    {
         //Arrange
         Server testServer = new Server();
 
@@ -59,26 +61,32 @@ public class UnitTest1
 
     //still testing #5  (see above test as well)
     [Fact]
-    public void WhenElectionTimeReset_ValueIsTrulyRandom() {
+    public void WhenElectionTimeReset_ValueIsTrulyRandom()
+    {
         //Arrange
         Server testServer = new();
         Dictionary<int, int> countAppears = new();
 
         //Act
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
+        {
             testServer.ResetElectionTimeout();
-            if (countAppears.ContainsKey(testServer.ElectionTimeout)) {
+            if (countAppears.ContainsKey(testServer.ElectionTimeout))
+            {
                 countAppears[testServer.ElectionTimeout] = countAppears[testServer.ElectionTimeout] + 1;
             }
-            else {
+            else
+            {
                 countAppears.Add(testServer.ElectionTimeout, 1);
             }
         }
 
         //Assert
         int duplicatesCount = 0;
-        foreach (var countPair in countAppears) {
-            if (countPair.Value > 1) {
+        foreach (var countPair in countAppears)
+        {
+            if (countPair.Value > 1)
+            {
                 duplicatesCount++;
             }
         }
@@ -187,7 +195,8 @@ public class UnitTest1
     //Testing #11
     //Given a candidate server that just became a candidate, it votes for itself.
     [Fact]
-    public void WhenServerBecomesCandidate_ThenVotesForItself() {
+    public void WhenServerBecomesCandidate_ThenVotesForItself()
+    {
         //Arrange
         Server willBeCandidate = new();
 
@@ -202,7 +211,8 @@ public class UnitTest1
     //Testing #10
     //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
     [Fact]
-    public void IfHaveNotYetVoted_VoteForALaterTermRequest() {
+    public void IfHaveNotYetVoted_VoteForALaterTermRequest()
+    {
         //Arrange
         Server willSayYes = new();
         willSayYes.CurrentTerm = 1;
@@ -220,7 +230,8 @@ public class UnitTest1
     //Testing #10
     //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
     [Fact]
-    public void IfHaveNotYetVoted_StillDontVoteForAnEarlierTermRequest() {
+    public void IfHaveNotYetVoted_StillDontVoteForAnEarlierTermRequest()
+    {
         //Arrange
         Server willSayYes = new();
         willSayYes.CurrentTerm = 1;
@@ -238,7 +249,8 @@ public class UnitTest1
     //Testing #14
     //If a node receives a second request for vote for the same term, it should respond no. (again, separate RPC for response)
     [Fact]
-    public void IfAlreadyVoted_DontVoteThatTermAgain() {
+    public void IfAlreadyVoted_DontVoteThatTermAgain()
+    {
         //Arrange
         Server someRandomServerWeVotedForInThatTerm = new();
         Server willSayNo = new();
@@ -404,7 +416,7 @@ public class UnitTest1
 
         //Act
         winningElection.State = States.Leader;
-        Thread.Sleep(51); //A heartbeat should have been sent at 50ms, so now we should see it
+        Thread.Sleep(50); //A heartbeat should have been sent at 50ms, so now we should see it
 
         //Assert
         receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
@@ -484,8 +496,29 @@ public class UnitTest1
         Thread.Sleep(301); //thus it will get no message
 
         //Assert
-        Assert.True(allByItself.State == States.Candidate || allByItself.State== States.Leader);
+        Assert.True(allByItself.State == States.Candidate || allByItself.State == States.Leader);
     }
 
+    //Testing a simulated network delay
+    //ONe potential hiccup I can see is I don't think I reset the list of people who have voted for them when they win an election
+    [Fact]
+    public void Test_simulated_network_delay_causes_message_not_received()
+    {
+        //Arrange
+        Server isLeader = new(false, false);
+        isLeader.State = States.Leader;
+        isLeader.CurrentTerm = 3;
+        var moq1 = Substitute.For<IServer>();
+        isLeader.OtherServersList.Add(moq1);
 
+
+        //Act
+        isLeader.NetworkDelay = 10000; //that's a delay of 10 seconds
+        isLeader.SendRequestForVoteRPCTo(moq1);
+        Thread.Sleep(1);
+
+        //Assert
+        moq1.Received(0).ReceiveVoteRequestFrom(isLeader, 3);
+
+    }
 }

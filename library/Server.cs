@@ -21,7 +21,7 @@ public class Server : IServer
     public int Id { get; set; }
 
     public int ElectionTimeoutAdjustmentFactor { get; set; } //default value of 1
-
+    public int NetworkDelay { get; set; }
     public List<IServer> OtherServersList = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
@@ -35,12 +35,14 @@ public class Server : IServer
     public Server()
     {
         ElectionTimeoutAdjustmentFactor = 1;
+        NetworkDelay = 0;
         this.State = States.Follower;
     }
 
     public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
     {
         ElectionTimeoutAdjustmentFactor = 1;
+        NetworkDelay = 0;
         this.State = States.Follower;
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
@@ -106,14 +108,16 @@ public class Server : IServer
         new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()) { IsBackground = true }.Start(); //Did we win?
     }
 
-    public void SendRequestForVoteRPCTo(Server server)
+    public void SendRequestForVoteRPCTo(IServer server)
     {
-        server.ReceiveVoteRequestFrom(this, this.CurrentTerm);
+        new Thread(() => server.ReceiveVoteRequestFrom(this, this.CurrentTerm)) { IsBackground = true }.Start();
+        //server.ReceiveVoteRequestFrom(this, this.CurrentTerm);
     }
 
     //The reason we pass the requestedVote current term (even though it's a property on the server requesting) is the server requesting might update its term after we receive it, so we can't trust that property and must specify it
-    private void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
+    public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
+        Thread.Sleep(NetworkDelay);
         if (requestedVoteCurrentTerm > this.CurrentTerm)
         {
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))

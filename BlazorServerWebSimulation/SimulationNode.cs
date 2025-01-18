@@ -16,6 +16,7 @@ public class SimulationNode: IServer {
     public Server? RecognizedLeader { get => ((IServer)InnerNode).RecognizedLeader; set => ((IServer)InnerNode).RecognizedLeader = value; }
     public States State { get => ((IServer)InnerNode).State; set => ((IServer)InnerNode).State = value; }
     public int ElectionTimeoutAdjustmentFactor { get => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor; set => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor = value; }
+    public int NetworkDelay { get; set; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {
@@ -55,6 +56,16 @@ public class SimulationNode: IServer {
     public void WinElection()
     {
         ((IServer)InnerNode).WinElection();
+    }
+
+    public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SendRequestForVoteRPCTo(IServer server)
+    {
+        throw new NotImplementedException();
     }
 
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
