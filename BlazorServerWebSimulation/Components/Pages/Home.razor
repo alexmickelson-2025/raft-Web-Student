@@ -11,25 +11,28 @@
 @if (!isRunning)
 {
     <button class="btn btn-primary" @onclick="startSimulation">Start Simulation</button>
-}
+}@* 
+    //I don't know how to stop the simulation yet.
 else
 {
     <button class="btn btn-danger" @onclick ="stopSimulation"> Stop Simulation </button >
-}
+} *@
 
 @* //the sliders come from his label for="speed" election tmeout between code *@
 
 <div class="row">
     @foreach(var node in nodes) {
         <div class="p-3 col-4 row">
-            <div class="border p-3 rounded">
+            <div class="@StateClass(node) border p-3 rounded">
                 <p>Node @node.Id</p>
                 <p>Term @node.CurrentTerm</p>
                 <p>State @node.State</p>
                 <p>Current leader @node?.RecognizedLeader?.Id</p>
                 <p>Election Timeout @node?.ElectionTimeout miliseconds</p>
-                <p>Time since hearing from leader @node?.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds</p>
-                <PageTitle>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</PageTitle>
+                @if (node?.State != States.Leader) {
+                    <p>Time since hearing from leader @node?.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds</p>
+                    <p>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</p>
+                }
             </div>
         </div>
     }
@@ -60,6 +63,7 @@ else
         </div>
     </div>
 </div>
+<p>Note: I know the network delay doesn't appear to be doing anything, but I am not sure why. I have written tests (that fail haha) and tried my best to get it to logically apply </p>
 
 @code {
     Boolean isRunning = false;
@@ -123,5 +127,16 @@ else
             simulation.NetworkDelay = this.NetworkDelay;
             simulation.ResetElectionTimeout();
         }
+    }
+
+    string StateClass(IServer node)
+    {
+       if (node.State == States.Leader)
+           return "text-primary";
+       if (node.State == States.Candidate)
+           return "text-warning";
+       if (node.State == States.Follower)
+           return "text-body-secondary";
+       return "";
     }
 }
