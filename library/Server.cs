@@ -94,6 +94,7 @@ public class Server : IServer
         if (!AppendEntriesResponseLog.ContainsKey(requestNumber))
         {
             AppendEntriesResponseLog.Add(requestNumber, accepted);
+            //BUG TODO I crashed here before adding the same request number twice. Perhaps I need locks on this.
         }
     }
 

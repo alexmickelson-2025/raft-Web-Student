@@ -19,17 +19,21 @@ else
 
 @* //the sliders come from his label for="speed" election tmeout between code *@
 
-@foreach(var node in nodes) {
-    <div class="p-3 col-4 row">
-        <div class="border p-3 rounded">
-            <p>Node @node.Id</p>
-            <p>Term @node.CurrentTerm</p>
-            <p>State @node.State</p>
-            <p>Current leader @node?.RecognizedLeader?.Id</p>
-            <p>Election Timeout @node?.ElectionTimeout miliseconds</p>
+<div class="row">
+    @foreach(var node in nodes) {
+        <div class="p-3 col-4 row">
+            <div class="border p-3 rounded">
+                <p>Node @node.Id</p>
+                <p>Term @node.CurrentTerm</p>
+                <p>State @node.State</p>
+                <p>Current leader @node?.RecognizedLeader?.Id</p>
+                <p>Election Timeout @node?.ElectionTimeout miliseconds</p>
+                <p>Time since hearing from leader @node?.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds</p>
+                <PageTitle>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</PageTitle>
+            </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 <div class= "row">
     <div class= "col">
@@ -73,10 +77,6 @@ else
         var node3 = new Server(true, true);
         node3.Id = 3;
 
-
-        //TODO: Next steps will be to change SimulationNode so it implements IServer instead of Server.
-        //TODO: but first I'm going to need to make sure my IServer interface contains every funciton it needs
-        //Or I could get my tests to pass first ...
         var simulation1 = new SimulationNode(node1);
         var simulation2 = new SimulationNode(node2);
         var simulation3 = new SimulationNode(node3);
@@ -90,11 +90,11 @@ else
         var timer = new Timer(_ =>
         {
             InvokeAsync(StateHasChanged);
-        }, null, 0, 200);
+        }, null, 0, 100);
     }
 
     public void stopSimulation() {
-
+        //I don't know what to do to stop it yet. Maybe set the election 
     }
 
     public static string FormatMilliSeconds(double milliSeconds)
