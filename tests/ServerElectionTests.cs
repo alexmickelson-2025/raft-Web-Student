@@ -8,7 +8,7 @@ using Simulation;
 
 namespace tests;
 
-public class ServerTests
+public class ServerElectionTests
 {
     ////Unit test 1
     //[Fact]
