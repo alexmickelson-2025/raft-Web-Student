@@ -517,7 +517,7 @@ public class ServerElectionTests
         //Act
         isLeader.NetworkDelay = 10000; //that's a delay of 10 seconds
         isLeader.SendRequestForVoteRPCTo(moq1);
-        Thread.Sleep(1);
+        //Thread.Sleep(1);
 
         //Assert
         moq1.Received(0).ReceiveVoteRequestFrom(isLeader, 3);
