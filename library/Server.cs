@@ -118,7 +118,10 @@ public class Server : IServer
     //The reason we pass the requestedVote current term (even though it's a property on the server requesting) is the server requesting might update its term after we receive it, so we can't trust that property and must specify it
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
-        Thread.Sleep(NetworkDelay);
+        if (NetworkDelay > 0)
+        {
+            Thread.Sleep(NetworkDelay);
+        }
         if (requestedVoteCurrentTerm > this.CurrentTerm)
         {
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))

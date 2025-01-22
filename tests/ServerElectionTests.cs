@@ -210,6 +210,7 @@ public class ServerElectionTests
 
     //Testing #10
     //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
+    //NOTE: Sometimes this fails and sometimes this passes depending on which time I run it, but now that I've added thread.sleep it seems to work every time
     [Fact]
     public void IfHaveNotYetVoted_VoteForALaterTermRequest()
     {
@@ -222,6 +223,7 @@ public class ServerElectionTests
 
         //Act
         inLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+        Thread.Sleep(5); //to give it enough time to finish the background thread
 
         //Assert
         Assert.Contains(willSayYes, inLaterTerm.VotesReceived);
