@@ -21,7 +21,7 @@ public class Server : IServer
     public int Id { get; set; }
 
     public int ElectionTimeoutAdjustmentFactor { get; set; } //default value of 1
-    public int NetworkDelay { get; set; }
+    public int NetworkDelay { get; set; } = 0;
     public List<IServer> OtherServersList = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
@@ -100,7 +100,7 @@ public class Server : IServer
 
     public void StartElection()
     {
-        this.VotesReceived.Add(this);
+        this.VotesReceived = [this];
         this.State = States.Candidate;
         this.CurrentTerm++;
         //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
@@ -137,6 +137,7 @@ public class Server : IServer
         serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, voteGiven);
     }
 
+    //todo check term in here
     private void ReceiveVoteResponseFrom(Server server, int requestedVoteCurrentTerm, bool voteGiven)
     {
         if (voteGiven)
