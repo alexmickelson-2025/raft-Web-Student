@@ -1,4 +1,5 @@
-﻿namespace library
+﻿
+namespace library
 {
     public interface IServer
     {
@@ -10,6 +11,8 @@
         public int ElectionTimeoutAdjustmentFactor { get; set; }
         public int NetworkDelay { get; set; }
         Server? RecognizedLeader { get; set; }
+        //I might make it a dictionary later. I do need to be able to check term and index, and make sure these things go in order. Linked list?
+        List<RaftLogEntry> LogBook { get; set; }
 
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm);
         void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted);

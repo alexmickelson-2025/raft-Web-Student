@@ -37,4 +37,18 @@ public class LogTests
         Assert.Equal(5, logEntry.TermNumber);
         Assert.Equal(1, logEntry.LogIndex);
     }
+
+    //Testing Logs #3) when a node is new, its log is empty
+    [Fact]
+    public void NewNode_HasEmptyLog()
+    {
+        //Arrange
+        IServer server;
+
+        //Act
+        server = new Server();
+
+        //Assert
+        Assert.Empty(server.LogBook);
+    }
 }

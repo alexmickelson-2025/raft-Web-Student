@@ -2,6 +2,7 @@
 
 //TODO: should implement INode, not node
 using library;
+
 namespace Simulation;
 public class SimulationNode: IServer {
     public int Id { get => ((IServer)InnerNode).Id;  set => ((IServer)InnerNode).Id = value; }
@@ -17,6 +18,7 @@ public class SimulationNode: IServer {
     public States State { get => ((IServer)InnerNode).State; set => ((IServer)InnerNode).State = value; }
     public int ElectionTimeoutAdjustmentFactor { get => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor; set => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor = value; }
     public int NetworkDelay { get; set; }
+    public List<RaftLogEntry> LogBook { get => ((IServer)InnerNode).LogBook; set => ((IServer)InnerNode).LogBook = value; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {

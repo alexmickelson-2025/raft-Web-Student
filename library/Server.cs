@@ -22,6 +22,8 @@ public class Server : IServer
 
     public int ElectionTimeoutAdjustmentFactor { get; set; } //default value of 1
     public int NetworkDelay { get; set; } = 0;
+    public List<RaftLogEntry> LogBook { get; set; }
+
     public List<IServer> OtherServersList = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
@@ -37,6 +39,8 @@ public class Server : IServer
         ElectionTimeoutAdjustmentFactor = 1;
         NetworkDelay = 0;
         this.State = States.Follower;
+        this.LogBook = new();
+        this.ResetElectionTimeout();
     }
 
     public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
@@ -44,6 +48,8 @@ public class Server : IServer
         ElectionTimeoutAdjustmentFactor = 1;
         NetworkDelay = 0;
         this.State = States.Follower;
+        this.LogBook = new();
+        this.ResetElectionTimeout();
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
             this.timeSinceHearingFromLeader.Start();
