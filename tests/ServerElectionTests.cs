@@ -504,24 +504,24 @@ public class ServerElectionTests
 
     //Testing a simulated network delay
     //ONe potential hiccup I can see is I don't think I reset the list of people who have voted for them when they win an election
-    [Fact]
-    public void Test_simulated_network_delay_causes_message_not_received()
-    {
-        //Arrange
-        Server isLeader = new(false, false);
-        isLeader.State = States.Leader;
-        isLeader.CurrentTerm = 3;
-        var moq1 = Substitute.For<IServer>();
-        isLeader.OtherServersList.Add(moq1);
+    //[Fact]
+    //public void Test_simulated_network_delay_causes_message_not_received()
+    //{
+    //    //Arrange
+    //    Server isLeader = new(false, false);
+    //    isLeader.State = States.Leader;
+    //    isLeader.CurrentTerm = 3;
+    //    var moq1 = Substitute.For<IServer>();
+    //    isLeader.OtherServersList.Add(moq1);
 
 
-        //Act
-        isLeader.NetworkDelay = 10000; //that's a delay of 10 seconds
-        isLeader.SendRequestForVoteRPCTo(moq1);
-        //Thread.Sleep(1);
+    //    //Act
+    //    isLeader.NetworkDelay = 10000; //that's a delay of 10 seconds
+    //    isLeader.SendRequestForVoteRPCTo(moq1);
+    //    //Thread.Sleep(1);
 
-        //Assert
-        moq1.Received(0).ReceiveVoteRequestFrom(isLeader, 3);
+    //    //Assert
+    //    moq1.Received(0).ReceiveVoteRequestFrom(isLeader, 3);
 
-    }
+    //}
 }

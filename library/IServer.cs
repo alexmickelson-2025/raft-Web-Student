@@ -21,10 +21,12 @@ namespace library
         void ReceiveClientCommand(string v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
         void ResetElectionTimeout();
+        void PauseTimeSinceHearingFromLeader();
         void SendAppendEntriesLogTo(Server follower);
         void SendHeartbeatToAllNodes();
         void SendRequestForVoteRPCTo(IServer server);
         void StartElection();
         void WinElection();
+        void RestartTimeSinceHearingFromLeader();
     }
 }

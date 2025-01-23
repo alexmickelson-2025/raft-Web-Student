@@ -159,6 +159,10 @@ public class Server : IServer
     {
         foreach (var server in OtherServersList)
         {
+            if (this.LogBook.Count > 0)
+            {
+                server.ReceiveAppendEntriesLogFrom(this, this.LogBook[0]); //Todo: obviously this can't send the first entry every time
+            }
             server.ReceiveAppendEntriesLogFrom(this, 1, this.CurrentTerm);
         }
     }
@@ -316,11 +320,21 @@ public class Server : IServer
         //Put the object in the log (so later in a heartbeat it can be sent!)
         LogBook.Add(request);
 
-        //Pass it onto each child
-        foreach (var server in OtherServersList)
-        {
-            server.ReceiveAppendEntriesLogFrom(this, request);
-        }
+        ////Pass it onto each child
+        //foreach (var server in OtherServersList)
+        //{
+        //    server.ReceiveAppendEntriesLogFrom(this, request);
+        //}
+    }
+
+    public void PauseTimeSinceHearingFromLeader()
+    {
+        this.timeSinceHearingFromLeader.Stop();
+    }
+
+    public void RestartTimeSinceHearingFromLeader()
+    {
+        this.timeSinceHearingFromLeader.Restart();
     }
 
     // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)

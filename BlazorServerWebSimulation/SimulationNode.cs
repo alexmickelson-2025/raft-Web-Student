@@ -81,6 +81,16 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveClientCommand(v);
     }
 
+    public void PauseTimeSinceHearingFromLeader()
+    {
+        ((IServer)InnerNode).PauseTimeSinceHearingFromLeader();
+    }
+
+    public void RestartTimeSinceHearingFromLeader()
+    {
+        ((IServer)InnerNode).RestartTimeSinceHearingFromLeader();
+    }
+
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
     //public Server? Leader {get => InnerNode.RecognizedLeader; set => InnerNode.RecognizedLeader = value;}
     ////public int Leader {get => InnerNode.Leader; set => InnerNode.Leader = value;}
