@@ -51,4 +51,36 @@ public class LogTests
         //Assert
         Assert.Empty(server.LogBook);
     }
+
+    //Testing Logs #1) when a leader receives a client command the leader sends the log entry in the next appendentries RPC to all nodes
+    [Fact]
+    public void WhenLeaderReceivesCommandFromClient_LeaderSendsLogEntryInNextAppendEntriesRPCToAllNodes()
+    {
+        //Questions to be decided so I can structure my logs appropriately:
+        //What data types/structure do I want?
+        //I need a term. For each term I have an index. So do I want a dictionary of arrays? (where the key in the dictionary is the term, adn the value is an array,
+        //and the index of that array is the particular command? (eg command 0 is at index 0 to "add" and at index 1 is the command "add" and at index 2 we were told "decrement"
+
+        //Arrange
+        IServer leader = new Server();
+        leader.CurrentTerm = 150;
+        var follower1 = Substitute.For<IServer>();
+        var follower2 = Substitute.For<IServer>();
+        leader.OtherServersList = [follower1, follower2];
+
+        //Act
+        leader.ReceiveClientCommand("IncrementBy1");
+
+        //Assert that each of the other servers received that log entry.
+        //I can do that by being sure that it received a call to AppendEntryRPC and that call contained the command IncrementBy1.
+        //The request they should be sending:
+        RaftLogEntry request = new()
+        {
+            Command = "IncrementBy1",
+            TermNumber = 150,
+            LogIndex = 1,
+        };
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Equals("IncrementBy1")));
+        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Equals("IncrementBy1")));
+    }
 }

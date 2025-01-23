@@ -13,9 +13,12 @@ namespace library
         Server? RecognizedLeader { get; set; }
         //I might make it a dictionary later. I do need to be able to check term and index, and make sure these things go in order. Linked list?
         List<RaftLogEntry> LogBook { get; set; }
+        public List<IServer> OtherServersList { get; set; }
 
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm);
+        void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);
         void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted);
+        void ReceiveClientCommand(string v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
         void ResetElectionTimeout();
         void SendAppendEntriesLogTo(Server follower);

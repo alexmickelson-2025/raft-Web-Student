@@ -24,7 +24,7 @@ public class Server : IServer
     public int NetworkDelay { get; set; } = 0;
     public List<RaftLogEntry> LogBook { get; set; }
 
-    public List<IServer> OtherServersList = new();
+    public List<IServer> OtherServersList { get; set; } = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
@@ -293,6 +293,30 @@ public class Server : IServer
                 //We send a heartbeat so I feel like we could wait 20 seconds to check 
                 //I just don't want to be checking each second because the odds we become leader and don't send a heartbeat are -- well -- it would mean we have a bug
             }
+        }
+    }
+
+    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
+    {
+
+        ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber);
+        //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
+    }
+
+    public void ReceiveClientCommand(string clientCommand)
+    {
+        //Compose a new command object
+        RaftLogEntry request = new RaftLogEntry()
+        {
+            Command = clientCommand,
+            LogIndex = 1, //update in the future
+            TermNumber = this.CurrentTerm
+        };
+
+        //Pass it onto each child
+        foreach (var server in OtherServersList)
+        {
+            server.ReceiveAppendEntriesLogFrom(this, request);
         }
     }
 

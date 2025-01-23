@@ -19,6 +19,7 @@ public class SimulationNode: IServer {
     public int ElectionTimeoutAdjustmentFactor { get => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor; set => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor = value; }
     public int NetworkDelay { get; set; }
     public List<RaftLogEntry> LogBook { get => ((IServer)InnerNode).LogBook; set => ((IServer)InnerNode).LogBook = value; }
+    public List<IServer> OtherServersList { get => ((IServer)InnerNode).OtherServersList; set => ((IServer)InnerNode).OtherServersList = value; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {
@@ -68,6 +69,16 @@ public class SimulationNode: IServer {
     public void SendRequestForVoteRPCTo(IServer server)
     {
         throw new NotImplementedException();
+    }
+
+    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
+    {
+        ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, request);
+    }
+
+    public void ReceiveClientCommand(string v)
+    {
+        ((IServer)InnerNode).ReceiveClientCommand(v);
     }
 
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
