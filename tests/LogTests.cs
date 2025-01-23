@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,5 +83,24 @@ public class LogTests
         };
         follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Equals("IncrementBy1")));
         follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Equals("IncrementBy1")));
+    }
+
+    //Testing Logs #2) when a leader receives a command from the client, it is appended to its log
+    [Fact]
+    public void WhenClientSendsCommand_LeaderAppendsToItsLog()
+    {
+        //Arrange
+        IServer leader = new Server();
+        leader.LogBook = new(); //should be empty, but just to avoid any confusion
+
+        //Act
+        leader.ReceiveClientCommand("DecrementBy2");
+
+        //Assert
+        var logEntry = leader.LogBook.SingleOrDefault(le => le.Command == "DecrementBy2");
+        Assert.NotNull(logEntry);  // Ensure the entry was added
+        Assert.Single(leader.LogBook);
+        Assert.Equal("DecrementBy2", logEntry.Command);
+        //Assert.Contains(Arg.Is<RaftLogEntry>(le => le.Command.Equals("DecrementBy2")), leader.LogBook);
     }
 }

@@ -313,6 +313,9 @@ public class Server : IServer
             TermNumber = this.CurrentTerm
         };
 
+        //Put the object in the log (so later in a heartbeat it can be sent!)
+        LogBook.Add(request);
+
         //Pass it onto each child
         foreach (var server in OtherServersList)
         {
