@@ -273,7 +273,7 @@ public class ServerElectionTests
     [Fact]
     public void IfHaveAlreadyVoted_VoteForALaterTermRequestAgain()
     {
-        //TODO: failed once, item not found in collection
+        //TODO: failed onctwicee, item not found in collection
 
         //Arrange
         Server willSayYes = new();
@@ -288,6 +288,7 @@ public class ServerElectionTests
         //Act
         inLaterTerm.SendRequestForVoteRPCTo(willSayYes);
         evenLaterTerm.SendRequestForVoteRPCTo(willSayYes);
+        Thread.Sleep(5); //just to give it all time to process
 
         //Assert
         Assert.Contains(willSayYes, inLaterTerm.VotesReceived);

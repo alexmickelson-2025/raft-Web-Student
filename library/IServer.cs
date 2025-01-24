@@ -30,5 +30,6 @@ namespace library
         void StartElection();
         void WinElection();
         void RestartTimeSinceHearingFromLeader();
+        void IncrementHighestCommittedIndex();
     }
 }

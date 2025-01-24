@@ -5,10 +5,10 @@
 ~~3) when a node is new, its log is empty~~
 ~~4) when a leader wins an election, it initializes the nextIndex for each follower to the index just after the last one in its log~~
 ~~5) leaders maintain an "nextIndex" for each follower that is the index of the next log entry the leader will send to that follower~~
-6) Highest committed index from the leader is included in AppendEntries RPC's
+~~6) Highest committed index from the leader is included in AppendEntries RPC's~~
 7) When a follower learns that a log entry is committed, it applies the entry to its local state machine
 8) when the leader has received a majority confirmation of a log, it commits it
-9) the leader commits logs by incrementing its committed log index
+~~9) the leader commits logs by incrementing its committed log index~~
 10) given a follower receives an appendentries with log(s) it will add those entries to its personal log
 11) a followers response to an appendentries includes the followers term number and log entry index
 12) when a leader receives a majority responses from the clients after a log replication heartbeat, the leader sends a confirmation response to the client
@@ -25,6 +25,10 @@
 18) if a leader cannot commit an entry, it does not send a response to the client
 19) if a node receives an appendentries with a logs that are too far in the future from your local state, you should reject the appendentries
 20) if a node receives and appendentries with a term and index that do not match, you will reject the appendentry until you find a matching log 
+
+Rachel's personal to do list for cleaner code:
+- [ ] refactor the SendAppendEntriesLogTo() functions and  all the receiveAppendEntries it calls
+- [ ] find an answer to the question of if the request number is the same as the log index number.
 
 ## Raft Election Test Cases
 1) ~~When a leader is active it sends a heart beat within 50ms.~~

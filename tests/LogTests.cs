@@ -189,4 +189,19 @@ public class LogTests
         //Assert
         follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(log => log.LeaderHighestCommittedIndex.Equals(3)));
     }
+
+    //Testing Logs #9) the leader commits logs by incrementing its committed log index
+    [Fact]
+    public void LeaderCommitsLog_ByIncrementingCommitedIndex()
+    {
+        //Arrange
+        IServer leader = new Server();
+        leader.HighestCommittedIndex = 2;
+
+        //Act
+        leader.IncrementHighestCommittedIndex(); //does leader need an index? Or can it always just increment?? Ask Adam or Alex
+
+        //Assert
+        Assert.Equal(3, leader.HighestCommittedIndex);
+    }
 }

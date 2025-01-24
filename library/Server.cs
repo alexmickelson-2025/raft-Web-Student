@@ -341,6 +341,35 @@ public class Server : IServer
         //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
 
         //Try copy/paste all from child function here
+        //this.RecognizedLeader = leader;
+        //if (request == null) //This will come out in a minute when we're done removing all other parameters and just receiving a log entry and a server
+        //{
+        //    if (request.TermNumber < this.CurrentTerm)
+        //    {
+        //        this.SendAppendEntriesResponseTo(server, requestNumber, false); //can request number really be the index number?
+        //    }
+        //    else
+        //    {
+        //        this.SendAppendEntriesResponseTo(server, requestNumber, true);
+        //        this.State = States.Follower;
+        //        this.timeSinceHearingFromLeader.Reset();
+        //        this.timeSinceHearingFromLeader.Start();
+        //    }
+        //}
+        //else
+        //{
+        //    if (logEntry.TermNumber < this.CurrentTerm)
+        //    {
+        //        this.SendAppendEntriesResponseTo(server, requestNumber, false);
+        //    }
+        //    else
+        //    {
+        //        this.SendAppendEntriesResponseTo(server, requestNumber, true);
+        //        this.State = States.Follower;
+        //        this.timeSinceHearingFromLeader.Reset();
+        //        this.timeSinceHearingFromLeader.Start();
+        //    }
+        //}
     }
 
     public void ReceiveClientCommand(string clientCommand)
@@ -373,9 +402,8 @@ public class Server : IServer
         this.timeSinceHearingFromLeader.Restart();
     }
 
-    // public async Task ProcessReceivedAppendEntryAsync(Server fromServer, int MilisecondsAtWhichReceived)
-    // {
-    //     await Task.CompletedTask;
-    //     return;
-    // }
+    public void IncrementHighestCommittedIndex()
+    {
+        this.HighestCommittedIndex++;
+    }
 }
