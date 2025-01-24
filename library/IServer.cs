@@ -16,6 +16,7 @@ namespace library
         public List<IServer> OtherServersList { get; set; }
         public Dictionary<IServer, int> NextIndex { get; set; }
         int HighestCommittedIndex { get; set; }
+        public Dictionary<string, string> StateDictionary { get; set; }
 
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);
@@ -31,5 +32,6 @@ namespace library
         void WinElection();
         void RestartTimeSinceHearingFromLeader();
         void IncrementHighestCommittedIndex();
+        void ApplyEntry(RaftLogEntry logEntry);
     }
 }

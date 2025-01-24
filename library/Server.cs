@@ -27,6 +27,7 @@ public class Server : IServer
     public List<IServer> OtherServersList { get; set; } = new();
     public Dictionary<IServer, int> NextIndex { get; set; } = new();
     public int HighestCommittedIndex { get; set; } = 0;
+    public Dictionary<string, string> StateDictionary { get; set; } = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
@@ -405,5 +406,10 @@ public class Server : IServer
     public void IncrementHighestCommittedIndex()
     {
         this.HighestCommittedIndex++;
+    }
+
+    public void ApplyEntry(RaftLogEntry logEntry)
+    {
+        this.StateDictionary[logEntry.Command.Item1] = logEntry.Command.Item2;
     }
 }

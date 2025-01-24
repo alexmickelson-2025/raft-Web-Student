@@ -226,13 +226,9 @@ public class LogTests
         };
 
         //Act
-        //follower.ApplyEntry(logEntry);
+        follower.ApplyEntry(logEntry);
 
         //Assert
-        // Assert.Equal("someValue", follower.StateDictionary["someKey"]);
-        Assert.Equal(0, 1);
-
-        //So the two things I will need to do to get this test to pass:
-        //
+        Assert.Equal("someValue", follower.StateDictionary["someKey"]);
     }
 }

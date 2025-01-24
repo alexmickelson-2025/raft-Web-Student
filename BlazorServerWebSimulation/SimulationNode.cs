@@ -22,6 +22,7 @@ public class SimulationNode: IServer {
     public List<IServer> OtherServersList { get => ((IServer)InnerNode).OtherServersList; set => ((IServer)InnerNode).OtherServersList = value; }
     public Dictionary<IServer, int> NextIndex { get => ((IServer)InnerNode).NextIndex; set => ((IServer)InnerNode).NextIndex = value; }
     public int HighestCommittedIndex { get => ((IServer)InnerNode).HighestCommittedIndex; set => ((IServer)InnerNode).HighestCommittedIndex = value; }
+    public Dictionary<string, string> StateDictionary { get => ((IServer)InnerNode).StateDictionary; set => ((IServer)InnerNode).StateDictionary = value; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
@@ -96,6 +97,11 @@ public class SimulationNode: IServer {
     public void IncrementHighestCommittedIndex()
     {
         ((IServer)InnerNode).IncrementHighestCommittedIndex();
+    }
+
+    public void ApplyEntry(RaftLogEntry logEntry)
+    {
+        ((IServer)InnerNode).ApplyEntry(logEntry);
     }
 
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
