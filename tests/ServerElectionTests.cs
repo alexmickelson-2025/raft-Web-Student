@@ -491,6 +491,7 @@ public class ServerElectionTests
     [Fact]
     public void WhenFollowerGetsNoMessageIn300ms_ThenStartsElection()
     {
+        //Todo: this failed once. I think with adding that for each loop in the winElection function, it took more than 301 ms?
         //Arrange
         Server allByItself = new(true, true);
         allByItself.State = States.Follower; //this should be a given but just in case

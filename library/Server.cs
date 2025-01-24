@@ -174,6 +174,11 @@ public class Server : IServer
         this.State = States.Leader;
         //TODO: is this what we want to do? setting recognized leader to null??
         this.RecognizedLeader = null;
+
+        //For log replication, we must adjust the nextIndex of each of our followers
+        foreach (var server in OtherServersList) {
+            this.NextIndex[server] = this.LogBook.Count + 1;
+        };
     }
 
     public void StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()
