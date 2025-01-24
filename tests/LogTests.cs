@@ -115,4 +115,24 @@ public class LogTests
         Assert.Equal("DecrementBy2", logEntry.Command);
         //Assert.Contains(Arg.Is<RaftLogEntry>(le => le.Command.Equals("DecrementBy2")), leader.LogBook);
     }
+
+    //Testing Logs #5) leaders maintain an "nextIndex" for each follower that is the index of the next log entry the leader will send to that follower
+    [Fact]
+    public void LeadersMaintainNextInex()
+    {
+        //Arrange
+        IServer leader = new Server();
+        var follower1 = Substitute.For<IServer>();
+        var follower2 = Substitute.For<IServer>();
+
+        //Act
+        leader.OtherServersList = [follower1, follower2];
+        leader.NextIndex[follower1] = 0;
+        leader.NextIndex[follower2] = 1;
+
+        //Assert
+        Assert.Equal(0, leader.NextIndex[follower1]);
+        Assert.Equal(1, leader.NextIndex[follower2]);
+
+    }
 }

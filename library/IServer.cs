@@ -14,6 +14,7 @@ namespace library
         //I might make it a dictionary later. I do need to be able to check term and index, and make sure these things go in order. Linked list?
         List<RaftLogEntry> LogBook { get; set; }
         public List<IServer> OtherServersList { get; set; }
+        public Dictionary<IServer, int> NextIndex { get; set; }
 
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);

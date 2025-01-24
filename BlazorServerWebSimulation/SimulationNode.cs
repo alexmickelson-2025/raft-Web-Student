@@ -20,6 +20,7 @@ public class SimulationNode: IServer {
     public int NetworkDelay { get; set; }
     public List<RaftLogEntry> LogBook { get => ((IServer)InnerNode).LogBook; set => ((IServer)InnerNode).LogBook = value; }
     public List<IServer> OtherServersList { get => ((IServer)InnerNode).OtherServersList; set => ((IServer)InnerNode).OtherServersList = value; }
+    public Dictionary<IServer, int> NextIndex { get => ((IServer)InnerNode).NextIndex; set => ((IServer)InnerNode).NextIndex = value; }
 
     public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
     {

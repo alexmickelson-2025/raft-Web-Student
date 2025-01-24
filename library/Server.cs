@@ -25,6 +25,7 @@ public class Server : IServer
     public List<RaftLogEntry> LogBook { get; set; }
 
     public List<IServer> OtherServersList { get; set; } = new();
+    public Dictionary<IServer, int> NextIndex { get; set; } = new();
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
