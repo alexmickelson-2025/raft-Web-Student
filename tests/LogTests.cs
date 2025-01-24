@@ -231,4 +231,12 @@ public class LogTests
         //Assert
         Assert.Equal("someValue", follower.StateDictionary["someKey"]);
     }
+
+    //Testing Logs #7) When a follower learns that a log entry is committed, it applies the entry to its local state machine
+    [Fact]
+    public void WhenFollowerLearnsLogEntryIsCommited_AppliesEntryToLocalStateMachine()
+    {
+        //Assert 
+        Assert.Equal(1, 0);
+    }
 }
