@@ -238,18 +238,19 @@ public class LogTests
     {
         //Arrange
         IServer follower = new Server();
+        follower.CurrentTerm = 1;
         var leader = Substitute.For<IServer>();
-        follower.LogBook.Add(new RaftLogEntry()
+        var logEntry = new RaftLogEntry()
         {
-            Command = ("LetterA", "Value5")
-        });
+            Command = ("LetterA", "Value5"),
+            TermNumber = 1
+        };
+        follower.LogBook.Add(logEntry);
 
         //Act
-        //follower.ReceiveAppendEntriesLogFrom(leader, )
+        follower.ReceiveAppendEntriesLogFrom(leader, logEntry);
 
-
-        //Act
         //Assert
-        Assert.Equal(1, 0);
+        Assert.Equal("Value5", follower.StateDictionary["LetterA"]);
     }
 }

@@ -18,7 +18,7 @@ namespace library
         int HighestCommittedIndex { get; set; }
         public Dictionary<string, string> StateDictionary { get; set; }
 
-        void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
+        void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);
         void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted);
         void ReceiveClientCommand((string, string) v);

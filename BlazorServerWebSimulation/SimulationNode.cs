@@ -24,7 +24,7 @@ public class SimulationNode: IServer {
     public int HighestCommittedIndex { get => ((IServer)InnerNode).HighestCommittedIndex; set => ((IServer)InnerNode).HighestCommittedIndex = value; }
     public Dictionary<string, string> StateDictionary { get => ((IServer)InnerNode).StateDictionary; set => ((IServer)InnerNode).StateDictionary = value; }
 
-    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
+    public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(server, requestNumber, requestCurrentTerm);
     }

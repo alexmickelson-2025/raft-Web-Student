@@ -86,7 +86,7 @@ public class Server : IServer
         //follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm, raftLogEntry); //I need to be able to automatically increment this
     }
 
-    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
+    public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         this.RecognizedLeader = server;
         if (logEntry == null) //This will come out in a minute when we're done removing all other parameters and just receiving a log entry and a server
@@ -349,11 +349,13 @@ public class Server : IServer
         {
             if (request.TermNumber < this.CurrentTerm)
             {
+                //reject the request because we have more info than it (its term is out of date)
                 this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
             }
             else
             {
                 //this.SendAppendEntriesResponseTo(leader, requestNumber, true);
+                ApplyEntry(request);
                 this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
                 this.State = States.Follower;
                 this.timeSinceHearingFromLeader.Reset();
