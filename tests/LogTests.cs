@@ -133,6 +133,33 @@ public class LogTests
         //Assert
         Assert.Equal(0, leader.NextIndex[follower1]);
         Assert.Equal(1, leader.NextIndex[follower2]);
+    }
 
+    //Testing Logs #4) when a leader wins an election, it initializes the nextIndex for each follower to the index just after the last one in its log
+    [Fact]
+    public void WhenLeaderWinsElection_InitializesNextIndexForEachFollowerToIndexJustAfterLastOneInLog()
+    {
+        //Arrange
+        IServer leader = new Server();
+        var follower1 = Substitute.For<IServer>();
+        var follower2 = Substitute.For<IServer>();
+        leader.OtherServersList = [follower1, follower2];
+        leader.NextIndex[follower1] = 1;
+        leader.NextIndex[follower2] = 2;
+        leader.LogBook = new List<RaftLogEntry>()
+        {
+            new(),
+            new(),
+            new(),
+            new(),
+            new()
+        };
+
+        //Act
+        leader.WinElection();
+
+        //Assert
+        Assert.Equal(6, leader.NextIndex[follower1]);
+        Assert.Equal(6, leader.NextIndex[follower2]);
     }
 }

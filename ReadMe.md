@@ -3,7 +3,7 @@
 ~~1) when a leader receives a client command the leader sends the log entry in the next appendentries RPC to all nodes??~~ done, although will need better specificity later to send only new log entries (not those already sent)
 ~~2) when a leader receives a command from the client, it is appended to its log~~ (ALTHOUGH i DON'T REALLY TALK ABOUT indexes making sure those are consistent yet)
 ~~3) when a node is new, its log is empty~~
-4) when a leader wins an election, it initializes the nextIndex for each follower to the index just after the last one it its log
+4) when a leader wins an election, it initializes the nextIndex for each follower to the index just after the last one in its log
 ~~5) leaders maintain an "nextIndex" for each follower that is the index of the next log entry the leader will send to that follower~~
 6) Highest committed index from the leader is included in AppendEntries RPC's
 7) When a follower learns that a log entry is committed, it applies the entry to its local state machine
