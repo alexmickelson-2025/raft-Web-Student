@@ -78,7 +78,7 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, request);
     }
 
-    public void ReceiveClientCommand(string v)
+    public void ReceiveClientCommand((string, string) v)
     {
         ((IServer)InnerNode).ReceiveClientCommand(v);
     }

@@ -20,7 +20,7 @@ namespace library
         void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);
         void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted);
-        void ReceiveClientCommand(string v);
+        void ReceiveClientCommand((string, string) v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
         void ResetElectionTimeout();
         void PauseTimeSinceHearingFromLeader();

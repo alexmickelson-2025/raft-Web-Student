@@ -75,7 +75,7 @@ public class Server : IServer
         //make a new appendEntriesLog to pass along
         RaftLogEntry raftLogEntry = new RaftLogEntry()
         {
-            Command = "",
+            Command = ("", ""),
             LeaderHighestCommittedIndex = this.HighestCommittedIndex,
             TermNumber = this.CurrentTerm,
             LogIndex = this.LogBook.Count + 1
@@ -372,7 +372,7 @@ public class Server : IServer
         //}
     }
 
-    public void ReceiveClientCommand(string clientCommand)
+    public void ReceiveClientCommand((string, string) clientCommand)
     {
         //Compose a new command object
         RaftLogEntry request = new RaftLogEntry()

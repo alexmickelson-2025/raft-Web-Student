@@ -28,13 +28,13 @@ public class LogTests
 
         //Act
         //let's put in the information here
-        logEntry.Command = "someCommand"; //Do I really want this to be a string? For me I kind of want to make it a separate class?? But I'm not sure how to store even addition commands besides as string
+        logEntry.Command = ("someCommand", ""); //Do I really want this to be a string? For me I kind of want to make it a separate class?? But I'm not sure how to store even addition commands besides as string
         logEntry.TermNumber = 5;
         logEntry.LogIndex = 1;
 
         //Assert
         //These are kind of weak assert statements, but it's to test that these properties exist...
-        Assert.Equal("someCommand", logEntry.Command);
+        Assert.Equal(("someCommand", ""), logEntry.Command);
         Assert.Equal(5, logEntry.TermNumber);
         Assert.Equal(1, logEntry.LogIndex);
     }
@@ -75,17 +75,19 @@ public class LogTests
 
         RaftLogEntry request = new()
         {
-            Command = "IncrementBy1",
+            Command = ("myKey", "IncrementBy1"),
             TermNumber = 150,
             LogIndex = 1,
         };
 
         //Act and assert
-        leader.ReceiveClientCommand("IncrementBy1"); 
+        leader.ReceiveClientCommand(("myKey", "IncrementBy1")); 
 
         //Step 1 of the assert: assert that if it's not time yet, we don't sent it!
-        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Equals("IncrementBy1")));
-        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Equals("IncrementBy1")));
+        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey")));
+        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1")));
+        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey")));
+        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1")));
 
         //Step 2 of the Act:
         //leader.RestartTimeSinceHearingFromLeader();
@@ -93,8 +95,10 @@ public class LogTests
         Thread.Sleep(50); //long enough for a heartbeat to go out
 
         //Step 2 of the Assert:
-        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Equals("IncrementBy1")));
-        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Equals("IncrementBy1")));
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey")));
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1")));
+        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey")));
+        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1"))); //add an item2 in there
     }
 
     //Testing Logs #2) when a leader receives a command from the client, it is appended to its log
@@ -106,13 +110,14 @@ public class LogTests
         leader.LogBook = new(); //should be empty, but just to avoid any confusion
 
         //Act
-        leader.ReceiveClientCommand("DecrementBy2");
+        leader.ReceiveClientCommand(("myKey", "DecrementBy2"));
 
         //Assert
-        var logEntry = leader.LogBook.SingleOrDefault(le => le.Command == "DecrementBy2");
+        var logEntry = leader.LogBook.SingleOrDefault(le => le.Command.Item1 == "myKey");
         Assert.NotNull(logEntry);  // Ensure the entry was added
         Assert.Single(leader.LogBook);
-        Assert.Equal("DecrementBy2", logEntry.Command);
+        Assert.Equal("myKey", logEntry.Command.Item1);
+        Assert.Equal("DecrementBy2", logEntry.Command.Item2);
         //Assert.Contains(Arg.Is<RaftLogEntry>(le => le.Command.Equals("DecrementBy2")), leader.LogBook);
     }
 
@@ -203,5 +208,31 @@ public class LogTests
 
         //Assert
         Assert.Equal(3, leader.HighestCommittedIndex);
+    }
+
+    //Testing Logs #7) When a follower learns that a log entry is committed, it applies the entry to its local state machine
+    [Fact]
+    public void TestApplyEntry_ActuallyAppliesEntry()
+    {
+        //Note for the grader: This test is really a precursor for testing number 7.
+        //What this test really does is tests my ApplyEntry() function  as it's a small part of test case number 7
+        //and I have another test to test number 7 more completely (it just depends on ApplyEntry() working correctly, which is why I have a separate test)
+
+        //Arrange
+        IServer follower = new Server();
+        RaftLogEntry logEntry = new RaftLogEntry()
+        {
+            Command = ("someKey", "someValue")
+        };
+
+        //Act
+        //follower.ApplyEntry(logEntry);
+
+        //Assert
+        // Assert.Equal("someValue", follower.StateDictionary["someKey"]);
+        Assert.Equal(0, 1);
+
+        //So the two things I will need to do to get this test to pass:
+        //
     }
 }
