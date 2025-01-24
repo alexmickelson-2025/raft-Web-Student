@@ -14,7 +14,7 @@ public class Server : IServer
 {
     public States State { get; set; }
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
-    public Server? RecognizedLeader { get; set; }
+    public IServer? RecognizedLeader { get; set; }
 
     public Dictionary<int, bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
@@ -119,7 +119,7 @@ public class Server : IServer
         }
     }
 
-    private void SendAppendEntriesResponseTo(Server server, int requestNumber, bool accepted)
+    private void SendAppendEntriesResponseTo(IServer server, int requestNumber, bool accepted)
     {
         server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
     }
@@ -337,40 +337,29 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
     {
-
-        ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber, request);
         //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
+        
+        this.RecognizedLeader = leader;
 
-        //Try copy/paste all from child function here
-        //this.RecognizedLeader = leader;
-        //if (request == null) //This will come out in a minute when we're done removing all other parameters and just receiving a log entry and a server
-        //{
-        //    if (request.TermNumber < this.CurrentTerm)
-        //    {
-        //        this.SendAppendEntriesResponseTo(server, requestNumber, false); //can request number really be the index number?
-        //    }
-        //    else
-        //    {
-        //        this.SendAppendEntriesResponseTo(server, requestNumber, true);
-        //        this.State = States.Follower;
-        //        this.timeSinceHearingFromLeader.Reset();
-        //        this.timeSinceHearingFromLeader.Start();
-        //    }
-        //}
-        //else
-        //{
-        //    if (logEntry.TermNumber < this.CurrentTerm)
-        //    {
-        //        this.SendAppendEntriesResponseTo(server, requestNumber, false);
-        //    }
-        //    else
-        //    {
-        //        this.SendAppendEntriesResponseTo(server, requestNumber, true);
-        //        this.State = States.Follower;
-        //        this.timeSinceHearingFromLeader.Reset();
-        //        this.timeSinceHearingFromLeader.Start();
-        //    }
-        //}
+        if (request == null)
+        {
+            ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber, request);
+        }
+        else
+        {
+            if (request.TermNumber < this.CurrentTerm)
+            {
+                this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
+            }
+            else
+            {
+                //this.SendAppendEntriesResponseTo(leader, requestNumber, true);
+                this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
+                this.State = States.Follower;
+                this.timeSinceHearingFromLeader.Reset();
+                this.timeSinceHearingFromLeader.Start();
+            }
+        }
     }
 
     public void ReceiveClientCommand((string, string) clientCommand)

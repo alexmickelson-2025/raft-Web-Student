@@ -236,7 +236,20 @@ public class LogTests
     [Fact]
     public void WhenFollowerLearnsLogEntryIsCommited_AppliesEntryToLocalStateMachine()
     {
-        //Assert 
+        //Arrange
+        IServer follower = new Server();
+        var leader = Substitute.For<IServer>();
+        follower.LogBook.Add(new RaftLogEntry()
+        {
+            Command = ("LetterA", "Value5")
+        });
+
+        //Act
+        //follower.ReceiveAppendEntriesLogFrom(leader, )
+
+
+        //Act
+        //Assert
         Assert.Equal(1, 0);
     }
 }

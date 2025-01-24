@@ -14,7 +14,7 @@ public class SimulationNode: IServer {
 
     public int CurrentTerm { get => ((IServer)InnerNode).CurrentTerm; set => ((IServer)InnerNode).CurrentTerm = value; }
     public int ElectionTimeout { get => ((IServer)InnerNode).ElectionTimeout; set => ((IServer)InnerNode).ElectionTimeout = value; }
-    public Server? RecognizedLeader { get => ((IServer)InnerNode).RecognizedLeader; set => ((IServer)InnerNode).RecognizedLeader = value; }
+    public IServer? RecognizedLeader { get => ((IServer)InnerNode).RecognizedLeader; set => ((IServer)InnerNode).RecognizedLeader = value; }
     public States State { get => ((IServer)InnerNode).State; set => ((IServer)InnerNode).State = value; }
     public int ElectionTimeoutAdjustmentFactor { get => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor; set => ((IServer)InnerNode).ElectionTimeoutAdjustmentFactor = value; }
     public int NetworkDelay { get; set; }
