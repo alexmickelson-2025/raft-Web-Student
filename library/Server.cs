@@ -26,6 +26,7 @@ public class Server : IServer
 
     public List<IServer> OtherServersList { get; set; } = new();
     public Dictionary<IServer, int> NextIndex { get; set; } = new();
+    public int HighestCommittedIndex { get; set; } = 0;
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
@@ -69,24 +70,51 @@ public class Server : IServer
         ElectionTimeout = val * ElectionTimeoutAdjustmentFactor;
     }
 
-    public void SendAppendEntriesLogTo(Server follower)
+    public void SendAppendEntriesLogTo(IServer follower)
     {
-        follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm); //I need to be able to automatically increment this
+        //make a new appendEntriesLog to pass along
+        RaftLogEntry raftLogEntry = new RaftLogEntry()
+        {
+            Command = "",
+            LeaderHighestCommittedIndex = this.HighestCommittedIndex,
+            TermNumber = this.CurrentTerm,
+            LogIndex = this.LogBook.Count + 1
+            //TODO: I'm not sure what to do about the log index. Is it really just the next available spot in the log book?
+        };
+        follower.ReceiveAppendEntriesLogFrom(this, raftLogEntry);
+        //follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm, raftLogEntry); //I need to be able to automatically increment this
     }
 
-    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
+    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         this.RecognizedLeader = server;
-        if (requestCurrentTerm < this.CurrentTerm)
+        if (logEntry == null) //This will come out in a minute when we're done removing all other parameters and just receiving a log entry and a server
         {
-            this.SendAppendEntriesResponseTo(server, requestNumber, false);
+            if (requestCurrentTerm < this.CurrentTerm)
+            {
+                this.SendAppendEntriesResponseTo(server, requestNumber, false);
+            }
+            else
+            {
+                this.SendAppendEntriesResponseTo(server, requestNumber, true);
+                this.State = States.Follower;
+                this.timeSinceHearingFromLeader.Reset();
+                this.timeSinceHearingFromLeader.Start();
+            }
         }
         else
         {
-            this.SendAppendEntriesResponseTo(server, requestNumber, true);
-            this.State = States.Follower;
-            this.timeSinceHearingFromLeader.Reset();
-            this.timeSinceHearingFromLeader.Start();
+            if (logEntry.TermNumber < this.CurrentTerm)
+            {
+                this.SendAppendEntriesResponseTo(server, requestNumber, false);
+            }
+            else
+            {
+                this.SendAppendEntriesResponseTo(server, requestNumber, true);
+                this.State = States.Follower;
+                this.timeSinceHearingFromLeader.Reset();
+                this.timeSinceHearingFromLeader.Start();
+            }
         }
     }
 
@@ -309,8 +337,10 @@ public class Server : IServer
     public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
     {
 
-        ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber);
+        ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber, request);
         //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
+
+        //Try copy/paste all from child function here
     }
 
     public void ReceiveClientCommand(string clientCommand)

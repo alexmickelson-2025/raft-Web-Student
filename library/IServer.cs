@@ -15,15 +15,16 @@ namespace library
         List<RaftLogEntry> LogBook { get; set; }
         public List<IServer> OtherServersList { get; set; }
         public Dictionary<IServer, int> NextIndex { get; set; }
+        int HighestCommittedIndex { get; set; }
 
-        void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm);
+        void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request);
         void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted);
         void ReceiveClientCommand(string v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
         void ResetElectionTimeout();
         void PauseTimeSinceHearingFromLeader();
-        void SendAppendEntriesLogTo(Server follower);
+        void SendAppendEntriesLogTo(IServer follower);
         void SendHeartbeatToAllNodes();
         void SendRequestForVoteRPCTo(IServer server);
         void StartElection();

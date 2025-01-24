@@ -8,7 +8,8 @@ namespace library;
 
 public class RaftLogEntry
 {
-    public string Command { get; set; }
+    public string Command { get; set; } = "";
     public int TermNumber { get; set; }
     public int LogIndex { get; set; }
+    public int LeaderHighestCommittedIndex { get; set; }
 }

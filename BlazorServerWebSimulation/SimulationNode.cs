@@ -21,8 +21,9 @@ public class SimulationNode: IServer {
     public List<RaftLogEntry> LogBook { get => ((IServer)InnerNode).LogBook; set => ((IServer)InnerNode).LogBook = value; }
     public List<IServer> OtherServersList { get => ((IServer)InnerNode).OtherServersList; set => ((IServer)InnerNode).OtherServersList = value; }
     public Dictionary<IServer, int> NextIndex { get => ((IServer)InnerNode).NextIndex; set => ((IServer)InnerNode).NextIndex = value; }
+    public int HighestCommittedIndex { get => ((IServer)InnerNode).HighestCommittedIndex; set => ((IServer)InnerNode).HighestCommittedIndex = value; }
 
-    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm)
+    public void ReceiveAppendEntriesLogFrom(Server server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(server, requestNumber, requestCurrentTerm);
     }
@@ -37,7 +38,7 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ResetElectionTimeout();
     }
 
-    public void SendAppendEntriesLogTo(Server follower)
+    public void SendAppendEntriesLogTo(IServer follower)
     {
         ((IServer)InnerNode).SendAppendEntriesLogTo(follower);
     }

@@ -162,4 +162,31 @@ public class LogTests
         Assert.Equal(6, leader.NextIndex[follower1]);
         Assert.Equal(6, leader.NextIndex[follower2]);
     }
+
+    //Testing Logs #6) Highest committed index from the leader is included in AppendEntries RPC's
+    [Fact]
+    public void SendingAppendEntryRPC_IncludesHighestCommittedIndex()
+    {
+        //Arrange
+        //Arrange
+        IServer leader = new Server();
+        var follower1 = Substitute.For<IServer>();
+        leader.OtherServersList = [follower1];
+        leader.NextIndex[follower1] = 1;
+        leader.LogBook = new List<RaftLogEntry>()
+        {
+            new(),
+            new(),
+            new(),
+            new(),
+            new()
+        };
+        leader.HighestCommittedIndex = 3;
+
+        //Act
+        leader.SendAppendEntriesLogTo(follower1);
+
+        //Assert
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(log => log.LeaderHighestCommittedIndex.Equals(3)));
+    }
 }
