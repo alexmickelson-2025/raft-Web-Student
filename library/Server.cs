@@ -85,7 +85,10 @@ public class Server : IServer
         follower.ReceiveAppendEntriesLogFrom(this, raftLogEntry);
         //follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm, raftLogEntry); //I need to be able to automatically increment this
     }
-
+    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request) //delete this one in a minute
+    {
+        ReceiveAppendEntriesLogFrom(leader, [request]);
+    }
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         this.RecognizedLeader = server;
@@ -335,31 +338,39 @@ public class Server : IServer
         }
     }
 
-    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
+    public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> requests)
     {
         //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
         
         this.RecognizedLeader = leader;
-
-        if (request == null)
+        if (requests == null)
         {
-            ReceiveAppendEntriesLogFrom((Server)leader, request.LogIndex, request.TermNumber, request);
+            ReceiveAppendEntriesLogFrom((Server)leader, requests.First().LogIndex, requests.First().TermNumber, requests.First());
         }
         else
         {
-            if (request.TermNumber < this.CurrentTerm)
+            foreach (var request in requests)
             {
-                //reject the request because we have more info than it (its term is out of date)
-                this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
-            }
-            else
-            {
-                //this.SendAppendEntriesResponseTo(leader, requestNumber, true);
-                ApplyEntry(request);
-                this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
-                this.State = States.Follower;
-                this.timeSinceHearingFromLeader.Reset();
-                this.timeSinceHearingFromLeader.Start();
+                if (request.TermNumber < this.CurrentTerm)
+                {
+                    //reject the request because we have more info than it (its term is out of date)
+                    this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
+                }
+                else
+                {
+                    //this.SendAppendEntriesResponseTo(leader, requestNumber, true);
+                    //I think I need to be putting this one in a different loop??
+                    while (leader.HighestCommittedIndex > this.HighestCommittedIndex)
+                    {
+                        ApplyEntry(LogBook[HighestCommittedIndex]);
+                        IncrementHighestCommittedIndex();
+                    }
+
+                    this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
+                    this.State = States.Follower;
+                    this.timeSinceHearingFromLeader.Reset();
+                    this.timeSinceHearingFromLeader.Start();
+                }
             }
         }
     }

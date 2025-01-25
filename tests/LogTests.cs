@@ -240,6 +240,32 @@ public class LogTests
         IServer follower = new Server();
         follower.CurrentTerm = 1;
         var leader = Substitute.For<IServer>();
+        leader.HighestCommittedIndex = 1;
+        follower.HighestCommittedIndex = 0;
+        var logEntry = new RaftLogEntry()
+        {
+            Command = ("LetterA", "Value5"),
+            TermNumber = 1,
+            LeaderHighestCommittedIndex = 1 //Question: do I really need this in the log entry?? Or can I just have it be on the leader?
+        };
+        follower.LogBook.Add(logEntry);
+
+        //Act
+        follower.ReceiveAppendEntriesLogFrom(leader, logEntry);
+
+        //Assert
+        Assert.Equal("Value5", follower.StateDictionary["LetterA"]);
+    }
+
+    //Testing Logs #7) When a follower learns that a log entry is committed, it applies the entry to its local state machine
+    [Fact]
+    public void WhenLogEntryNOTCommited_EntryNOTAppliedToLocalStateMachine()
+    {
+        //Arrange
+        IServer follower = new Server();
+        follower.CurrentTerm = 1;
+        var leader = Substitute.For<IServer>();
+        leader.HighestCommittedIndex = 0;
         var logEntry = new RaftLogEntry()
         {
             Command = ("LetterA", "Value5"),
@@ -251,6 +277,37 @@ public class LogTests
         follower.ReceiveAppendEntriesLogFrom(leader, logEntry);
 
         //Assert
-        Assert.Equal("Value5", follower.StateDictionary["LetterA"]);
+        Assert.Empty(follower.StateDictionary); //because since the highest committed index is 0, this should not have been applied.
+    }
+
+    //Testing #10) given a follower receives an appendentries with log(s) it will add those entries to its personal log
+    [Fact]
+    public void GivenFollowerReceivesAppendEntries_AndItContainsLogs_ThenAddsEntriesToPersonalLog()
+    {
+        //Arrange
+        IServer follower = new Server();
+        follower.LogBook = [];
+        follower.CurrentTerm = 3;
+
+        var leader = Substitute.For<IServer>();
+        var entry1 = new RaftLogEntry()
+        {
+            Command = ("someKey", "5"),
+            TermNumber = 3
+        };
+        var entry2 = new RaftLogEntry()
+        {
+            Command = ("someOtherKey", "7"),
+            TermNumber = 3
+        };
+        var entries = new List<RaftLogEntry>() { entry1, entry2 };
+        leader.LogBook = entries;
+
+        //Act
+        follower.ReceiveAppendEntriesLogFrom(leader, entries);
+
+        //Assert
+        Assert.Contains(entry1, follower.LogBook);
+        Assert.Contains(entry2, follower.LogBook);
     }
 }
