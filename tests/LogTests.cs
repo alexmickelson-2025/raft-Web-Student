@@ -337,5 +337,6 @@ public class LogTests
         };
 
         leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, 10, true); //todo: I want to make this receive the AppendEntryResponseObject instead. It needs to to hold the term number
+        Assert.Equal(1, 0); //this is in here because this test is not done being properly written
     }
 }

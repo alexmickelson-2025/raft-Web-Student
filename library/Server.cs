@@ -366,6 +366,8 @@ public class Server : IServer
                         IncrementHighestCommittedIndex();
                     }
 
+                    this.LogBook.Add(request);
+
                     this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
                     this.State = States.Follower;
                     this.timeSinceHearingFromLeader.Reset();
