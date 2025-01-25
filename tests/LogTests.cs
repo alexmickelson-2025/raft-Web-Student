@@ -1,5 +1,6 @@
 ﻿using Castle.Components.DictionaryAdapter.Xml;
 using library;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using System;
@@ -309,5 +310,32 @@ public class LogTests
         //Assert
         Assert.Contains(entry1, follower.LogBook);
         Assert.Contains(entry2, follower.LogBook);
+    }
+
+    //Testing Logs #11) a followers response to an appendentries includes the followers term number and log entry index
+    [Fact]
+    public void FollowerResponseToAppendEntries_IncluesTermNumberAndLogIndex()
+    {
+        //Arrange
+        IServer follower = new Server();
+        var leader = Substitute.For<IServer>();
+        RaftLogEntry logEntry = new RaftLogEntry()
+        {
+            LogIndex = 10,
+            TermNumber = 3
+        };
+
+        //Act
+        follower.ReceiveAppendEntriesLogFrom(leader, [logEntry]);
+
+        //Assert
+        AppendEntryResponse expectedResponse = new()
+        {
+            TermNumber = 3,
+            LogIndex = 10,
+            Accepted = true,
+        };
+
+        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, 10, true); //todo: I want to make this receive the AppendEntryResponseObject instead. It needs to to hold the term number
     }
 }

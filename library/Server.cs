@@ -127,7 +127,7 @@ public class Server : IServer
         server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
     }
 
-    public void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted)
+    public void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted)
     {
 
         if (!AppendEntriesResponseLog.ContainsKey(requestNumber))

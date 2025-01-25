@@ -29,7 +29,7 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(server, requestNumber, requestCurrentTerm);
     }
 
-    public void ReceiveAppendEntriesLogResponseFrom(Server server, int requestNumber, bool accepted)
+    public void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted)
     {
         ((IServer)InnerNode).ReceiveAppendEntriesLogResponseFrom(server, requestNumber, accepted);
     }
