@@ -319,6 +319,7 @@ public class LogTests
         //Arrange
         IServer follower = new Server();
         var leader = Substitute.For<IServer>();
+        //leader.CurrentTerm = 3; //NOTE: uncommenting this is all it takes for the test to pass, but I'm leaving it red intentionally because I want to refactor other functions so we don't need this.
         RaftLogEntry logEntry = new RaftLogEntry()
         {
             LogIndex = 10,
@@ -339,6 +340,16 @@ public class LogTests
         leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.LogIndex.Equals(10)));
         //The reason this one (term number) fails is because we currently get term number from the server, when really we need to get it from the request
         //But that's going to be a separate refactor of our ReceiveAppendEntiresLogFrom method/how it calls the receive response methos
-        //leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.TermNumber.Equals(3))); 
+        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.TermNumber.Equals(3))); 
+    }
+
+    //Testing Logs #8) when the leader has received a majority confirmation of a log, it commits it  
+    [Fact]
+    public void WhenLeaderReceivesMajorityConfirmation_ThenCommitsLog()
+    {
+        //Arrange
+        IServer leader = new Server();
+
+        Assert.Equal(1, 0);
     }
 }
