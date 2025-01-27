@@ -137,18 +137,26 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
-        ReceiveAppendEntriesLogResponseFrom(server, response.LogIndex, response.Accepted);
-    }
-
-    public void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted)
-    {
-
-        if (!AppendEntriesResponseLog.ContainsKey(requestNumber))
+        if (!AppendEntriesResponseLog.ContainsKey(response.LogIndex))
         {
-            AppendEntriesResponseLog.Add(requestNumber, accepted);
+            AppendEntriesResponseLog.Add(response.LogIndex, response.Accepted);
             //BUG TODO I crashed here one time adding the same request number twice. Perhaps I need locks on this?
+            //Also I worry that with this refactor (getting rid of the REceiveAppendEntriesLogResponse) that now sometimes my appendEntiresResponse log is going to get confused when 
+            //the leader falls behind (what if it appends the wrong log)
         }
+        //ReceiveAppendEntriesLogResponseFrom(server, response.LogIndex, response.Accepted);
     }
+
+    //public void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted)
+    //{
+
+    //    //if (!AppendEntriesResponseLog.ContainsKey(requestNumber))
+    //    //{
+    //    //    AppendEntriesResponseLog.Add(requestNumber, accepted);
+    //    //    //BUG TODO I crashed here one time adding the same request number twice. Perhaps I need locks on this?
+    //    //}
+    //    throw new Exception("We shouldn't have called this!");
+    //}
 
     public void StartElection()
     {

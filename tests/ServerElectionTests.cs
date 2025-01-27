@@ -425,6 +425,7 @@ public class ServerElectionTests
         Thread.Sleep(50); //A heartbeat should have been sent at 50ms, so now we should see it
 
         //Assert
+        //THIS FAILS HALF THE TIME because sometimes it receives 2 calls
         receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
 
     }

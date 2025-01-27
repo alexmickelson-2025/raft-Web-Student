@@ -23,7 +23,7 @@ namespace library
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request); //delete this one in a minute
         void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request);
         public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response);
-        void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted);
+        //void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted);
         void ReceiveClientCommand((string, string) v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
         void ResetElectionTimeout();
