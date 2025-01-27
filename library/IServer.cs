@@ -35,5 +35,6 @@ namespace library
         void IncrementHighestCommittedIndex();
         void ApplyEntry(RaftLogEntry logEntry);
         void PauseSimulation();
+        void Resume();
     }
 }

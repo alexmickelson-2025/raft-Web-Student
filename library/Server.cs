@@ -432,4 +432,9 @@ public class Server : IServer
     {
         timeSinceLastSentHeartbeatAsLeader.Stop();
     }
+
+    public void Resume()
+    {
+        timeSinceLastSentHeartbeatAsLeader.Restart();
+    }
 }
