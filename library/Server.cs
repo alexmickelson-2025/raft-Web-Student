@@ -125,7 +125,14 @@ public class Server : IServer
 
     private void SendAppendEntriesResponseTo(IServer server, int requestNumber, bool accepted)
     {
-        server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
+        var response = new AppendEntryResponse()
+        {
+            TermNumber = server.CurrentTerm,
+            LogIndex = requestNumber,
+            Accepted = accepted
+        };
+        server.ReceiveAppendEntriesLogResponseFrom(this, response);
+        //server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
     }
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
@@ -363,10 +370,13 @@ public class Server : IServer
         {
             foreach (var request in requests)
             {
+                
+
                 if (request.TermNumber < this.CurrentTerm)
                 {
                     //reject the request because we have more info than it (its term is out of date)
                     this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
+                    
                 }
                 else
                 {

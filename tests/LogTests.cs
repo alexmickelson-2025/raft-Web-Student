@@ -336,7 +336,9 @@ public class LogTests
             Accepted = true,
         };
 
-        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, 10, true); //todo: I want to make this receive the AppendEntryResponseObject instead. It needs to to hold the term number
-        Assert.Equal(1, 0); //this is in here because this test is not done being properly written
+        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.LogIndex.Equals(10)));
+        //The reason this one (term number) fails is because we currently get term number from the server, when really we need to get it from the request
+        //But that's going to be a separate refactor of our ReceiveAppendEntiresLogFrom method/how it calls the receive response methos
+        //leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.TermNumber.Equals(3))); 
     }
 }

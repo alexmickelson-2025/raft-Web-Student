@@ -34,6 +34,12 @@ else
                     <p>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</p>
                 }
             </div>
+            @if(node.IsPaused) {
+                <button class="btn btn-outline-dark" onclick="">Resume</button>
+            }
+            else {
+                <button class="btn btn-outline-dark" onclick="pause(@node)">Pause</button>
+            }
         </div>
     }
 </div>
@@ -131,12 +137,17 @@ else
 
     string StateClass(IServer node)
     {
-       if (node.State == States.Leader)
-           return "text-primary";
-       if (node.State == States.Candidate)
-           return "text-warning";
-       if (node.State == States.Follower)
-           return "text-body-secondary";
-       return "";
+        if (node.State == States.Leader)
+            return "text-primary";
+        if (node.State == States.Candidate)
+            return "text-warning";
+        if (node.State == States.Follower)
+            return "text-body-secondary";
+        return "";
+    }
+
+    public void pause(SimulationNode node)  {
+        Console.WriteLine("Pause simulation was called");
+        node.PauseSimulation();
     }
 }
