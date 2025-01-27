@@ -127,6 +127,11 @@ public class Server : IServer
         server.ReceiveAppendEntriesLogResponseFrom(this, requestNumber, accepted);
     }
 
+    public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
+    {
+        ReceiveAppendEntriesLogResponseFrom(server, response.LogIndex, response.Accepted);
+    }
+
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted)
     {
 
