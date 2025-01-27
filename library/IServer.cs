@@ -3,6 +3,7 @@ namespace library
 {
     public interface IServer
     {
+        public bool IsPaused { get; set; }
         int Id { get; set; }
         public States State { get; set; }
         int CurrentTerm { get; set; }

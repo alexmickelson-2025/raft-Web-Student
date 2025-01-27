@@ -28,6 +28,7 @@ public class Server : IServer
     public Dictionary<IServer, int> NextIndex { get; set; } = new();
     public int HighestCommittedIndex { get; set; } = 0;
     public Dictionary<string, string> StateDictionary { get; set; } = new();
+    public bool IsPaused { get; set; } = false;
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
@@ -323,22 +324,22 @@ public class Server : IServer
             if (this.State == States.Leader)
             {
                 ////EDGE case just in case
-                //if (!timeSinceLastSentHeartbeatAsLeader.IsRunning)
-                //{
-                //    this.SendHeartbeatToAllNodes();
-                //    timeSinceLastSentHeartbeatAsLeader.Start();
-                //}
-                //else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
-                //{
-                //    this.SendHeartbeatToAllNodes();
-                //    timeSinceLastSentHeartbeatAsLeader.Restart();
-                //}
-                //EDGE case just in case
-                if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
+                if (!timeSinceLastSentHeartbeatAsLeader.IsRunning && !IsPaused)
+                {
+                    this.SendHeartbeatToAllNodes();
+                    timeSinceLastSentHeartbeatAsLeader.Start();
+                }
+                else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
                 {
                     this.SendHeartbeatToAllNodes();
                     timeSinceLastSentHeartbeatAsLeader.Restart();
                 }
+                ////EDGE case just in case
+                //if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
+                //{
+                //    this.SendHeartbeatToAllNodes();
+                //    timeSinceLastSentHeartbeatAsLeader.Restart();
+                //}
             }
             else
             {
@@ -430,11 +431,13 @@ public class Server : IServer
 
     public void PauseSimulation()
     {
+        IsPaused = true;
         timeSinceLastSentHeartbeatAsLeader.Stop();
     }
 
     public void Resume()
     {
+        IsPaused = false;
         timeSinceLastSentHeartbeatAsLeader.Restart();
     }
 }

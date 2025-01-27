@@ -23,6 +23,7 @@ public class SimulationNode: IServer {
     public Dictionary<IServer, int> NextIndex { get => ((IServer)InnerNode).NextIndex; set => ((IServer)InnerNode).NextIndex = value; }
     public int HighestCommittedIndex { get => ((IServer)InnerNode).HighestCommittedIndex; set => ((IServer)InnerNode).HighestCommittedIndex = value; }
     public Dictionary<string, string> StateDictionary { get => ((IServer)InnerNode).StateDictionary; set => ((IServer)InnerNode).StateDictionary = value; }
+    public bool IsPaused { get => ((IServer)InnerNode).IsPaused; set => ((IServer)InnerNode).IsPaused = value; }
 
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {

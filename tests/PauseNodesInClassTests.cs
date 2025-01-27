@@ -36,6 +36,7 @@ public class PauseNodesInClassTests
         follower3.Received(0).ReceiveAppendEntriesLogFrom(server, Arg.Any<int>(), Arg.Any<int>());
     }
 
+    //Test case 2
     [Fact]
     public void CanPauseNodeThenResumeIn400Milliseconds()
     {
@@ -68,5 +69,17 @@ public class PauseNodesInClassTests
         follower1.Received().ReceiveAppendEntriesLogFrom(server, Arg.Any<int>(), Arg.Any<int>());
         follower2.Received().ReceiveAppendEntriesLogFrom(server, Arg.Any<int>(), Arg.Any<int>());
         follower3.Received().ReceiveAppendEntriesLogFrom(server, Arg.Any<int>(), Arg.Any<int>());
+    }
+
+    //Test Case 3 When follower gets paused, it does not time out to become a candidate
+    [Fact]
+    public void WhenFollowerGetsPaused_DoesNotTimeOutToBecomeCandidate()
+    {
+        //Arrange
+
+        //Act
+
+        //Assert
+        Assert.Equal(1, 0);
     }
 }
