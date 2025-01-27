@@ -34,5 +34,6 @@ namespace library
         void RestartTimeSinceHearingFromLeader();
         void IncrementHighestCommittedIndex();
         void ApplyEntry(RaftLogEntry logEntry);
+        void PauseSimulation();
     }
 }

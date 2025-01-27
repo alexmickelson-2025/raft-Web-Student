@@ -109,6 +109,11 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, request);
     }
 
+    public void PauseSimulation()
+    {
+        ((IServer)InnerNode).PauseSimulation();
+    }
+
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
     //public Server? Leader {get => InnerNode.RecognizedLeader; set => InnerNode.RecognizedLeader = value;}
     ////public int Leader {get => InnerNode.Leader; set => InnerNode.Leader = value;}

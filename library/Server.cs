@@ -322,13 +322,19 @@ public class Server : IServer
         {
             if (this.State == States.Leader)
             {
+                ////EDGE case just in case
+                //if (!timeSinceLastSentHeartbeatAsLeader.IsRunning)
+                //{
+                //    this.SendHeartbeatToAllNodes();
+                //    timeSinceLastSentHeartbeatAsLeader.Start();
+                //}
+                //else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
+                //{
+                //    this.SendHeartbeatToAllNodes();
+                //    timeSinceLastSentHeartbeatAsLeader.Restart();
+                //}
                 //EDGE case just in case
-                if (!timeSinceLastSentHeartbeatAsLeader.IsRunning)
-                {
-                    this.SendHeartbeatToAllNodes();
-                    timeSinceLastSentHeartbeatAsLeader.Start();
-                }
-                else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
+                if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
                 {
                     this.SendHeartbeatToAllNodes();
                     timeSinceLastSentHeartbeatAsLeader.Restart();
@@ -420,5 +426,10 @@ public class Server : IServer
     public void ApplyEntry(RaftLogEntry logEntry)
     {
         this.StateDictionary[logEntry.Command.Item1] = logEntry.Command.Item2;
+    }
+
+    public void PauseSimulation()
+    {
+        timeSinceLastSentHeartbeatAsLeader.Stop();
     }
 }
