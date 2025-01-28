@@ -319,7 +319,7 @@ public class LogTests
         //Arrange
         IServer follower = new Server();
         var leader = Substitute.For<IServer>();
-        //leader.CurrentTerm = 3; //NOTE: uncommenting this is all it takes for the test to pass, but I'm leaving it red intentionally because I want to refactor other functions so we don't need this.
+        //leader.CurrentTerm = 3; //NOTE: uncommenting this is all it takes for the test to pass, but I'm leaving it red intentionally because I want to refactor other functions so we don't 
         RaftLogEntry logEntry = new RaftLogEntry()
         {
             LogIndex = 10,
@@ -349,7 +349,29 @@ public class LogTests
     {
         //Arrange
         IServer leader = new Server();
+        leader.State = States.Candidate;
+        leader.CurrentTerm = 5;
+        var follower1 = Substitute.For<IServer>();
+        var follower2 = Substitute.For<IServer>();
+        var follower3 = Substitute.For<IServer>();
+        var follower4 = Substitute.For<IServer>();
+        var follower5 = Substitute.For<IServer>();
+        leader.OtherServersList = new List<IServer>() { follower1, follower2, follower3, follower4, follower5};
+        leader.HighestCommittedIndex = 0;
 
-        Assert.Equal(1, 0);
+        AppendEntryResponse reply = new AppendEntryResponse()
+        {
+            LogIndex = 1,
+            TermNumber = 5,
+            Accepted = true,
+        };
+
+        //Act
+        leader.ReceiveAppendEntriesLogResponseFrom(follower1, reply);
+        leader.ReceiveAppendEntriesLogResponseFrom(follower2, reply);
+        leader.ReceiveAppendEntriesLogResponseFrom(follower5, reply);
+
+        //Assert
+        Assert.Equal(1, leader.HighestCommittedIndex);
     }
 }

@@ -26,6 +26,7 @@ namespace library
         //void ReceiveAppendEntriesLogResponseFrom(IServer server, int requestNumber, bool accepted);
         void ReceiveClientCommand((string, string) v);
         void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm);
+        public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven);
         void ResetElectionTimeout();
         void PauseTimeSinceHearingFromLeader();
         void SendAppendEntriesLogTo(IServer follower);

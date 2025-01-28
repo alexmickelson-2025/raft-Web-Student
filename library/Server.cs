@@ -32,7 +32,7 @@ public class Server : IServer
 
     public Dictionary<int, Server> VotesCast = new(); //<termNumber, ServerWeVotedFor>
 
-    public List<Server> VotesReceived = new(); //If it has a Server in it, that means the server has voted for it with that current term.
+    public List<IServer> VotesReceived = new(); //If it has a Server in it, that means the server has voted for it with that current term.
 
     public Stopwatch timeSinceHearingFromLeader = new();
     private Stopwatch timeSinceLastSentHeartbeatAsLeader = new();
@@ -198,7 +198,7 @@ public class Server : IServer
     }
 
     //todo check term in here
-    private void ReceiveVoteResponseFrom(Server server, int requestedVoteCurrentTerm, bool voteGiven)
+    public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
     {
         if (voteGiven)
         { //potential bug: don't I need to also make sure that the vote is being 

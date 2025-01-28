@@ -120,6 +120,11 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveAppendEntriesLogResponseFrom(server, response);
     }
 
+    public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
+    {
+        ((IServer)InnerNode).ReceiveVoteResponseFrom(server, requestedVoteCurrentTerm, voteGiven);
+    }
+
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
     //public Server? Leader {get => InnerNode.RecognizedLeader; set => InnerNode.RecognizedLeader = value;}
     ////public int Leader {get => InnerNode.Leader; set => InnerNode.Leader = value;}
