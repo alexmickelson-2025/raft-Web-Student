@@ -357,21 +357,30 @@ public class LogTests
         var follower4 = Substitute.For<IServer>();
         var follower5 = Substitute.For<IServer>();
         leader.OtherServersList = new List<IServer>() { follower1, follower2, follower3, follower4, follower5};
-        leader.HighestCommittedIndex = 0;
+        leader.HighestCommittedIndex = -1;
 
         AppendEntryResponse reply = new AppendEntryResponse()
         {
-            LogIndex = 1,
+            LogIndex = 0,
             TermNumber = 5,
             Accepted = true,
         };
-
+        var logEntry = new RaftLogEntry
+        {
+            Command = ("", ""),
+            LeaderHighestCommittedIndex = leader.HighestCommittedIndex,
+            LogIndex = 0,
+            TermNumber = 5,
+        };
+        //leader.LogBook.Add(new RaftLogEntry { Command = ("Intentionally Empty", "INtentionallyEmpty") });
+        leader.LogBook.Add(logEntry); //So we have an index fo rthe log book.
+        
         //Act
         leader.ReceiveAppendEntriesLogResponseFrom(follower1, reply);
         leader.ReceiveAppendEntriesLogResponseFrom(follower2, reply);
         leader.ReceiveAppendEntriesLogResponseFrom(follower5, reply);
 
         //Assert
-        Assert.Equal(1, leader.HighestCommittedIndex);
+        Assert.Equal(0, leader.HighestCommittedIndex);
     }
 }

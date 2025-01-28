@@ -15,8 +15,8 @@ public class Server : IServer
     public States State { get; set; }
     public int ElectionTimeout { get; set; } //Specifies the Election Timeout in milisecondss
     public IServer? RecognizedLeader { get; set; }
-
-    public Dictionary<int, bool> AppendEntriesResponseLog = new();
+    public Dictionary<int, List<IServer>> AppendEntriesResponseLog = new();
+    //public Dictionary<int, <bool> AppendEntriesResponseLog = new();
     public int CurrentTerm { get; set; }
     public int Id { get; set; }
 
@@ -139,10 +139,19 @@ public class Server : IServer
     {
         if (!AppendEntriesResponseLog.ContainsKey(response.LogIndex))
         {
-            AppendEntriesResponseLog.Add(response.LogIndex, response.Accepted);
+            AppendEntriesResponseLog.Add(response.LogIndex, new List<IServer>() { server });
             //BUG TODO I crashed here one time adding the same request number twice. Perhaps I need locks on this?
-            //Also I worry that with this refactor (getting rid of the REceiveAppendEntriesLogResponse) that now sometimes my appendEntiresResponse log is going to get confused when 
-            //the leader falls behind (what if it appends the wrong log)
+        }
+        else //at least 1 item is already in there, so we must append to the list
+        {
+            var list = AppendEntriesResponseLog[response.LogIndex];
+            list.Add(server);
+            AppendEntriesResponseLog[response.LogIndex] = list;
+        }
+        //Let's also add something to see if we have received a majority of responses and can commit the log
+        if (AppendEntriesResponseLog[response.LogIndex].Count >= (OtherServersList.Count / 2 + 1)) //Because then we have a majority of responses.
+        {
+            CommitEntry(response.LogIndex); //this will call increment highest ccommitted index, and apply entry
         }
         //ReceiveAppendEntriesLogResponseFrom(server, response.LogIndex, response.Accepted);
     }
@@ -368,7 +377,6 @@ public class Server : IServer
     public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> requests)
     {
         //TODO: Fix the method we're calling here (refactor following Jonathan's principles)
-        
         this.RecognizedLeader = leader;
         if (requests == null)
         {
@@ -378,8 +386,6 @@ public class Server : IServer
         {
             foreach (var request in requests)
             {
-                
-
                 if (request.TermNumber < this.CurrentTerm)
                 {
                     //reject the request because we have more info than it (its term is out of date)
@@ -435,6 +441,12 @@ public class Server : IServer
     public void RestartTimeSinceHearingFromLeader()
     {
         this.timeSinceHearingFromLeader.Restart();
+    }
+
+    public void CommitEntry(int logIndex)
+    {
+        ApplyEntry(LogBook[logIndex]);
+        IncrementHighestCommittedIndex();
     }
 
     public void IncrementHighestCommittedIndex()

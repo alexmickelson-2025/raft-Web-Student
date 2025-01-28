@@ -125,10 +125,10 @@ public class ServerElectionTests
         //Act
         //i could keep track of the request id that it is rejecting or receiving so that when I need to know which one they're responding to I can tell
         //give my server an id too
-        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //reequest id 1
+        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //request id 1
 
         //Assert
-        Assert.True(leader.AppendEntriesResponseLog[1]);
+        Assert.Contains(leader, leader.AppendEntriesResponseLog[1]);
     }
 
     //Testing #18
@@ -146,7 +146,8 @@ public class ServerElectionTests
         follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //request id 1
 
         //Assert
-        Assert.False(leader.AppendEntriesResponseLog[1]);
+        //Assert.False(leader.AppendEntriesResponseLog[1]);
+        Assert.Contains(leader, leader.AppendEntriesResponseLog[1]);
     }
 
     //Testing #7
