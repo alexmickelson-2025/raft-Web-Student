@@ -125,6 +125,11 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ReceiveVoteResponseFrom(server, requestedVoteCurrentTerm, voteGiven);
     }
 
+    public void CommitEntry(int logIndex)
+    {
+        ((IServer)InnerNode).CommitEntry(logIndex);
+    }
+
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}
     //public Server? Leader {get => InnerNode.RecognizedLeader; set => InnerNode.RecognizedLeader = value;}
     ////public int Leader {get => InnerNode.Leader; set => InnerNode.Leader = value;}

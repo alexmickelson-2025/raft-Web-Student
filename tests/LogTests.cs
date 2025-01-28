@@ -383,4 +383,77 @@ public class LogTests
         //Assert
         Assert.Equal(0, leader.HighestCommittedIndex);
     }
+
+    //Testing Logs #8) when the leader has received a majority confirmation of a log, it commits it
+    /// <summary>
+    /// /But this is the inverse of it: That if I don't have a majority of votes yet the log does not get committed
+    /// </summary>
+    [Fact]
+    public void WhenLeaderNotYetHaveMajorityConfirmation_ThenLogNotcommittedYet()
+    {
+        //Arrange
+        IServer leader = new Server();
+        leader.State = States.Candidate;
+        leader.CurrentTerm = 5;
+        var follower1 = Substitute.For<IServer>();
+        var follower2 = Substitute.For<IServer>();
+        var follower3 = Substitute.For<IServer>();
+        var follower4 = Substitute.For<IServer>();
+        var follower5 = Substitute.For<IServer>();
+        leader.OtherServersList = new List<IServer>() { follower1, follower2, follower3, follower4, follower5 };
+        leader.HighestCommittedIndex = -1;
+
+        AppendEntryResponse PositiveReply = new AppendEntryResponse()
+        {
+            LogIndex = 0,
+            TermNumber = 5,
+            Accepted = true,
+        };
+        //AppendEntryResponse NegativeReply = new AppendEntryResponse()
+        //{
+        //    LogIndex = 0,
+        //    TermNumber = 5,
+        //    Accepted = true,
+        //};
+        var logEntry = new RaftLogEntry
+        {
+            Command = ("", ""),
+            LeaderHighestCommittedIndex = leader.HighestCommittedIndex,
+            LogIndex = 0,
+            TermNumber = 5,
+        };
+        //leader.LogBook.Add(new RaftLogEntry { Command = ("Intentionally Empty", "INtentionallyEmpty") });
+        leader.LogBook.Add(logEntry); //So we have an index fo rthe log book.
+
+        //Act
+        leader.ReceiveAppendEntriesLogResponseFrom(follower1, PositiveReply);
+        leader.ReceiveAppendEntriesLogResponseFrom(follower2, PositiveReply);
+
+        //Assert
+        Assert.Equal(-1, leader.HighestCommittedIndex);
+    }
+
+    //Testing Logs #13) given a leader node, when a log is committed, it applies it to its internal state machine
+    [Fact]
+    public void WhenLeaderCommitsLog_AppliesToInternalStateMachine()
+    {
+        //Arrange
+        IServer server = new Server();
+        var log = new RaftLogEntry
+        {
+            LogIndex = 11,
+            TermNumber = 5,
+            Command = ("Test", "5")
+        };
+        server.LogBook.Add(log);
+
+        //Act
+        server.CommitEntry(0);
+
+        //Assert
+        Assert.Equal("5", server.StateDictionary["Test"]);
+    }
+
+    //Testing Logs #16) when a leader sends a heartbeat with a log, but does not receive responses from a majority of nodes, the entry is uncommitted 
+
 }

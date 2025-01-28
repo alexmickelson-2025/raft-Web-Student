@@ -39,5 +39,6 @@ namespace library
         void ApplyEntry(RaftLogEntry logEntry);
         void PauseSimulation();
         void Resume();
+        public void CommitEntry(int logIndex);
     }
 }
