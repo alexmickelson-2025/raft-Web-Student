@@ -390,10 +390,11 @@ public class Server : IServer
                 {
                     //reject the request because we have more info than it (its term is out of date)
                     this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
-                    
                 }
                 else
                 {
+                    this.LogBook.Add(request);
+
                     //this.SendAppendEntriesResponseTo(leader, requestNumber, true);
                     //I think I need to be putting this one in a different loop??
                     while (leader.HighestCommittedIndex > this.HighestCommittedIndex)
@@ -401,8 +402,6 @@ public class Server : IServer
                         ApplyEntry(LogBook[HighestCommittedIndex + 1]); //THis is the line we broke on
                         IncrementHighestCommittedIndex();
                     }
-
-                    this.LogBook.Add(request);
 
                     this.SendAppendEntriesResponseTo(leader, request.LogIndex, true);
                     this.State = States.Follower;
