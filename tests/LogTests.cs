@@ -562,7 +562,7 @@ public class LogTests
         //Act
         //When this function is called, the leader not only rejects it, but the leader is going to re-try by sending the previous log
         follower.ReceiveAppendEntriesLogFrom(leader, someLogThatWontMatch);
-        leader.ReceiveAppendEntriesLogResponsPueFrom(follower, rejectionResponse);
+        leader.ReceiveAppendEntriesLogResponseFrom(follower, rejectionResponse);
 
         //Assert
         //but we will change this so it asserts the previous log entry was received.
