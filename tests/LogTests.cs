@@ -483,6 +483,39 @@ public class LogTests
         Assert.Equal(0, follower.HighestCommittedIndex);
     }
 
+    //Testing Logs # 14 part 2 
+    //      - reject the heartbeat if the previous log index / term number does not match your log
+    [Fact]
+    public void RejectHeartbeatIfPreviousLogIndexAndTermNumberDoNotMatch()
+    {
+        //Arrange
+        IServer leader = Substitute.For<IServer>();
+        IServer follower = new Server();
+        var someLogThatWontMatch = new RaftLogEntry()
+        {
+            LeaderHighestCommittedIndex = 3,
+            PreviousLogIndex = 2,
+            PreviousLogTerm = 2,
+            TermNumber = 3,
+        };
+
+        var someOldLog = new RaftLogEntry()
+        {
+            LeaderHighestCommittedIndex = 3,
+            LogIndex = 1,
+            TermNumber = 2
+        };
+
+        follower.LogBook.Add(new RaftLogEntry { }); //so now we're at index 1 for the log book, and the next one it will get has previous index 2, so this isn't going to match
+        follower.LogBook.Add(someOldLog);
+
+        //Act
+        follower.ReceiveAppendEntriesLogFrom(leader, someLogThatWontMatch);
+
+        //Assert
+        leader.Received().ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.Accepted.Equals(false)));
+    }
+
 
     //[Fact]
     //public void WhenFollowerReceivesHeartbeat_AndPreviousIndexDoesNotMatch_ThenRejects()

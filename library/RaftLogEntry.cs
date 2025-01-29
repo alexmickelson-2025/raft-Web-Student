@@ -11,5 +11,8 @@ public class RaftLogEntry
     public (string, string) Command { get; set; } = ("", "");
     public int TermNumber { get; set; }
     public int LogIndex { get; set; }
+    public int PreviousLogIndex { get; set; }
+    public int PreviousLogTerm { get; set; }
+
     public int LeaderHighestCommittedIndex { get; set; }
 }

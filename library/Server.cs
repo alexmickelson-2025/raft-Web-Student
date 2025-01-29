@@ -386,7 +386,16 @@ public class Server : IServer
         {
             foreach (var request in requests)
             {
+                bool logIndexMatches = (request.PreviousLogIndex == this.LogBook.Count);
+                bool termMatches = request.PreviousLogTerm == this.LogBook[LogBook.Count - 1].TermNumber;
+
                 if (request.TermNumber < this.CurrentTerm)
+                {
+                    //reject the request because we have more info than it (its term is out of date)
+                    this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
+                }
+                // the previous term number and previous log index from the last request must match 
+                else if (logIndexMatches && termMatches)
                 {
                     //reject the request because we have more info than it (its term is out of date)
                     this.SendAppendEntriesResponseTo(leader, request.LogIndex, false); //is request number my log index?? Or is this different?
