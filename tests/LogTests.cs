@@ -375,7 +375,7 @@ public class LogTests
             TermNumber = 5,
         };
         //leader.LogBook.Add(new RaftLogEntry { Command = ("Intentionally Empty", "INtentionallyEmpty") });
-        leader.LogBook.Add(logEntry); //So we have an index fo rthe log book.
+        leader.LogBook.Add(logEntry); //So we have an index for the log book.
         
         //Act
         leader.ReceiveAppendEntriesLogResponseFrom(follower1, reply);
@@ -514,6 +514,62 @@ public class LogTests
 
         //Assert
         leader.Received().ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.Accepted.Equals(false)));
+    }
+
+    //Testing Logs #15) When sending an AppendEntries RPC, the leader includes the index and term of the entry in its log that immediately precedes the new entries  
+    //   - if a follower rejects the AppendEntries RPC, the leader decrements nextIndex and retries the AppendEntries RPC
+    [Fact]
+    public void WhenSendingAppendEntriesRPC_IfRejected_DecrementRPC_andTryAgain()
+    {
+        //Arrange
+        IServer leader = new Server();
+        IServer follower = Substitute.For<IServer>();
+        var firstLogWeCareAbout = new RaftLogEntry()
+        {
+            LeaderHighestCommittedIndex = 1,
+            PreviousLogIndex = 1,
+            PreviousLogTerm = 1,
+            TermNumber = 2,
+            LogIndex = 0,
+        };
+        var secondLog = new RaftLogEntry()
+        {
+            LeaderHighestCommittedIndex = 3,
+            LogIndex = 1,
+            PreviousLogIndex = 0,
+            TermNumber = 2
+        };
+
+        var someLogThatWontMatch = new RaftLogEntry()
+        {
+            LeaderHighestCommittedIndex = 3,
+            PreviousLogIndex = 1,
+            PreviousLogTerm = 40, //see? clearly doesn't match
+            TermNumber = 4,
+            LogIndex = 2
+        };
+
+        leader.LogBook.Add(firstLogWeCareAbout);
+        leader.LogBook.Add(secondLog);
+        leader.LogBook.Add(someLogThatWontMatch);
+
+        var rejectionResponse = new AppendEntryResponse
+        {
+            Accepted = false,
+            LogIndex = 2
+        };
+
+        //Act
+        //When this function is called, the leader not only rejects it, but the leader is going to re-try by sending the previous log
+        follower.ReceiveAppendEntriesLogFrom(leader, someLogThatWontMatch);
+        leader.ReceiveAppendEntriesLogResponsPueFrom(follower, rejectionResponse);
+
+        //Assert
+        //but we will change this so it asserts the previous log entry was received.
+        follower.Received().ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(log => log.LogIndex.Equals(1))); 
+        
+        follower.Received().ReceiveAppendEntriesLogFrom(leader, secondLog); 
+         
     }
 
 

@@ -137,6 +137,14 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
+        //If our appendEntriesResponseWasREjected, send the previous one:
+        if(!response.Accepted)
+        {
+            server.ReceiveAppendEntriesLogFrom(this, [LogBook[response.LogIndex - 1]]);
+            return;
+        }
+
+        //ELSE, it was accepted, so we need to record that
         if (!AppendEntriesResponseLog.ContainsKey(response.LogIndex))
         {
             AppendEntriesResponseLog.Add(response.LogIndex, new List<IServer>() { server });
