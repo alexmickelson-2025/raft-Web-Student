@@ -20,8 +20,8 @@
         - term must be same or newer
         - if index is greater, it will be decreased by leader
         - if index is less, we delete what we have
-    - if a follower rejects the AppendEntries RPC, the leader decrements nextIndex and retries the AppendEntries RPC
-16) when a leader sends a heartbeat with a log, but does not receive responses from a majority of nodes, the entry is uncommitted  
+    - if a follower rejects the AppendEntries RPC, the leader decrements nextIndex and retries the AppendEntries RPC  
+~~16) when a leader sends a heartbeat with a log, but does not receive responses from a majority of nodes, the entry is uncommitted~~  
 17) if a leader does not response from a follower, the leader continues to send the log entries in subsequent heartbeats    
 18) if a leader cannot commit an entry, it does not send a response to the client  
 19) if a node receives an appendentries with a logs that are too far in the future from your local state, you should reject the appendentries  

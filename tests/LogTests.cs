@@ -9,7 +9,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace tests;
 
@@ -384,16 +386,34 @@ public class LogTests
         Assert.Equal(0, leader.HighestCommittedIndex);
     }
 
-    //Testing Logs #8) when the leader has received a majority confirmation of a log, it commits it
-    /// <summary>
-    /// /But this is the inverse of it: That if I don't have a majority of votes yet the log does not get committed
-    /// </summary>
+    //Testing Logs #13) given a leader node, when a log is committed, it applies it to its internal state machine
+    [Fact]
+    public void WhenLeaderCommitsLog_AppliesToInternalStateMachine()
+    {
+        //Arrange
+        IServer server = new Server();
+        var log = new RaftLogEntry
+        {
+            LogIndex = 11,
+            TermNumber = 5,
+            Command = ("Test", "5")
+        };
+        server.LogBook.Add(log);
+
+        //Act
+        server.CommitEntry(0);
+
+        //Assert
+        Assert.Equal("5", server.StateDictionary["Test"]);
+    }
+
+    //Testing Logs #16) when a leader sends a heartbeat with a log, but does not receive responses from a majority of nodes, the entry is uncommitted 
     [Fact]
     public void WhenLeaderNotYetHaveMajorityConfirmation_ThenLogNotcommittedYet()
     {
         //Arrange
         IServer leader = new Server();
-        leader.State = States.Candidate;
+        leader.State = States.Leader;
         leader.CurrentTerm = 5;
         var follower1 = Substitute.For<IServer>();
         var follower2 = Substitute.For<IServer>();
@@ -426,34 +446,73 @@ public class LogTests
         leader.LogBook.Add(logEntry); //So we have an index fo rthe log book.
 
         //Act
+        leader.SendAppendEntriesLogTo(follower1);
+        leader.SendAppendEntriesLogTo(follower2);
+        leader.SendAppendEntriesLogTo(follower3);
+        leader.SendAppendEntriesLogTo(follower4);
+        leader.SendAppendEntriesLogTo(follower5);
+
+        //It even receives a response from some of them:
         leader.ReceiveAppendEntriesLogResponseFrom(follower1, PositiveReply);
-        leader.ReceiveAppendEntriesLogResponseFrom(follower2, PositiveReply);
+        leader.ReceiveAppendEntriesLogResponseFrom(follower5, PositiveReply);
 
         //Assert
         Assert.Equal(-1, leader.HighestCommittedIndex);
     }
 
-    //Testing Logs #13) given a leader node, when a log is committed, it applies it to its internal state machine
+    //Testing Logs #14) when a follower receives a valid heartbeat, it increases its commitIndex to match the commit index of the heartbeat  
+    //      - reject the heartbeat if the previous log index / term number does not match your log
     [Fact]
-    public void WhenLeaderCommitsLog_AppliesToInternalStateMachine()
+    public void WhenFolowerReceivesValidHeartbeat_IncreasesCommitIndex()
     {
         //Arrange
-        IServer server = new Server();
-        var log = new RaftLogEntry
+        IServer follower = new Server();
+        follower.CurrentTerm = 1;
+        follower.HighestCommittedIndex = -1; //because this will be its first committed index in the test
+        var leader = Substitute.For<IServer>();
+        RaftLogEntry logEntry = new()
         {
-            LogIndex = 11,
-            TermNumber = 5,
-            Command = ("Test", "5")
+            LeaderHighestCommittedIndex = 0,
+            TermNumber = 1,
         };
-        server.LogBook.Add(log);
 
         //Act
-        server.CommitEntry(0);
+        follower.ReceiveAppendEntriesLogFrom(leader, [logEntry]);
 
         //Assert
-        Assert.Equal("5", server.StateDictionary["Test"]);
+        Assert.Equal(0, follower.HighestCommittedIndex);
     }
 
-    //Testing Logs #16) when a leader sends a heartbeat with a log, but does not receive responses from a majority of nodes, the entry is uncommitted 
 
+    //[Fact]
+    //public void WhenFollowerReceivesHeartbeat_AndPreviousIndexDoesNotMatch_ThenRejects()
+    //{
+    //    //Arrange
+    //    IServer leader = new Server();
+    //    leader.State = States.Candidate;
+    //    leader.CurrentTerm = 5;
+    //    leader.LogBook.Add(new RaftLogEntry { });
+    //    leader.LogBook.Add(new RaftLogEntry { });
+    //    var newLog = new RaftLogEntry
+    //    {
+    //        TermNumber = 5,
+    //        LogIndex = 2
+    //    };
+
+    //    leader.LogBook.Add(newLog); // and we know its index is index 2
+
+    //    var follower1 = Substitute.For<IServer>();
+    //    follower1.LogBook.Add(new RaftLogEntry {
+    //        TermNumber = 4
+    //    });
+    //    follower1.LogBook.Add(new RaftLogEntry {
+    //        TermNumber = 4
+    //    }); //so its index is 1
+
+
+
+    //    //Act
+    //    follower1.ReceiveAppendEntriesLogFrom(leader, [newLog]);
+
+    //}
 }

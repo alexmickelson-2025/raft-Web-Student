@@ -398,7 +398,7 @@ public class Server : IServer
                     //I think I need to be putting this one in a different loop??
                     while (leader.HighestCommittedIndex > this.HighestCommittedIndex)
                     {
-                        ApplyEntry(LogBook[HighestCommittedIndex]);
+                        ApplyEntry(LogBook[HighestCommittedIndex + 1]); //THis is the line we broke on
                         IncrementHighestCommittedIndex();
                     }
 
