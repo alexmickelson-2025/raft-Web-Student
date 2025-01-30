@@ -63,7 +63,7 @@ else
                         </tbody>
                     </table>
                 }
-               
+
                 <p>Highest committed index is: @node.HighestCommittedIndex</p>
 
                 <h5>Committed Logs (@node.HighestCommittedIndex):</h5>
@@ -90,6 +90,26 @@ else
             </div>
         </div>
     }
+</div>
+
+<div class="col">
+    <div class="border p-3 rounded-3">
+        <label>
+            Key <input class= "form-control" @bind=userInputKey/>
+        </label>
+        <label>
+            Value <input class= "form-control" @bind=userInputValue />
+        </label>
+        <hr>
+        @foreach(var node in nodes)
+        {
+            <button class= "btn btn-outline-primary mx-1" @onclick = "() => SendCommand(node.Id)" > Send to Node @node.Id</button>
+        }
+
+        <div>
+            @commandStatus
+        </div>
+    </div>
 </div>
 
 <div class= "row">
@@ -124,6 +144,30 @@ else
     int ElectionTimeoutAdjustment { get; set; }
     int NetworkDelay { get; set; }
     List<SimulationNode>? nodes = [];
+
+    string userInputKey = "";
+    string userInputValue = "";
+    string commandStatus = "";
+
+    async Task SendCommand(int destinationId)
+    {
+        commandStatus = "sending";
+        var dest = nodes?.FirstOrDefault(n => n.Id == destinationId);
+        dest?.ReceiveClientCommand((userInputKey, userInputValue));
+        commandStatus = "sent";
+        Thread.Sleep(2000);
+        commandStatus = "";
+
+        // var command = new ClientCommandData(
+        //     Type: ClientCommandType.Set,
+        //     Key: userInputKey,
+        //     Value: userInputValue,
+        //     RespondToClient: async (success, leaderId) =>
+        //     {
+        //         commandStatus = $"response was {success}, leader is {leaderId}";
+        //     }
+        // );
+    }
 
     void startSimulation() {
         isRunning = true;
