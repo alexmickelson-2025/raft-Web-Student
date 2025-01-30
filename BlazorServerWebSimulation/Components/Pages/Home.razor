@@ -106,11 +106,20 @@ else
         {
             <button class= "btn btn-outline-primary mx-1" @onclick = "() => SendCommand(node.Id)" > Send to Node @node.Id</button>
         }
-
         <div>
-            @commandStatus
+            Status of message: @commandStatus
         </div>
     </div>
+
+    @* < div class= "bg-body-secondary my-3 p-1 rounded-3" >
+        < strong > LOG </ strong >
+        @foreach(var(log, index) in node.InnerNode.Log.Select((l, i) => (l, i)))
+        {
+        < div class=@(index <= node.InnerNode.CommittedEntryIndex ? "text-success" : "") >
+            @log.TermId - @log.Key: @log.Value
+        </ div >
+        }
+    </ div > *@
 </div>
 
 <div class= "row">
@@ -154,10 +163,13 @@ else
     {
         commandStatus = "sending";
         var dest = nodes?.FirstOrDefault(n => n.Id == destinationId);
+
+        if (dest?.State != States.Leader) {
+            commandStatus = "failed to send, node {destinationId} is not the leader";
+            return;
+        }
         dest?.ReceiveClientCommand((userInputKey, userInputValue));
         commandStatus = "sent";
-        Thread.Sleep(2000);
-        commandStatus = "";
 
         // var command = new ClientCommandData(
         //     Type: ClientCommandType.Set,
@@ -179,6 +191,8 @@ else
         node2.Id = 2;
         var node3 = new Server(true, true);
         node3.Id = 3;
+
+        // node1.State = States.Leader;
 
         var simulation1 = new SimulationNode(node1);
         var simulation2 = new SimulationNode(node2);

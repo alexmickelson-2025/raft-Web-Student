@@ -138,9 +138,12 @@ public class Server : IServer
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
         //If our appendEntriesResponseWasREjected, send the previous one:
-        if(!response.Accepted)
+        if(!response.Accepted && response.TermNumber <= this.CurrentTerm)
         {
-            server.ReceiveAppendEntriesLogFrom(this, [LogBook[response.LogIndex - 1]]);
+            if (response.LogIndex - 1 >= 0 && response.LogIndex - 1 < LogBook.Count())
+            {
+                server.ReceiveAppendEntriesLogFrom(this, [LogBook[response.LogIndex - 1]]);
+            }
             return;
         }
 
@@ -395,7 +398,15 @@ public class Server : IServer
             foreach (var request in requests)
             {
                 bool logIndexMatches = (request.PreviousLogIndex == this.LogBook.Count);
-                bool termMatches = request.PreviousLogTerm == this.LogBook[LogBook.Count - 1].TermNumber;
+                bool termMatches = true;
+                if (LogBook.Count - 1 < 0)
+                {
+                    termMatches = false;
+                }
+                else
+                {
+                    termMatches = request.PreviousLogTerm == this.LogBook[LogBook.Count - 1].TermNumber;
+                }
 
                 if (request.TermNumber < this.CurrentTerm)
                 {
