@@ -164,22 +164,12 @@ else
         commandStatus = "sending";
         var dest = nodes?.FirstOrDefault(n => n.Id == destinationId);
 
-        if (dest?.State != States.Leader) {
-            commandStatus = "failed to send, node {destinationId} is not the leader";
-            return;
-        }
+        // if (dest?.State != States.Leader) {
+        //     commandStatus = "failed to send, node {destinationId} is not the leader";
+        //     return;
+        // }
         dest?.ReceiveClientCommand((userInputKey, userInputValue));
         commandStatus = "sent";
-
-        // var command = new ClientCommandData(
-        //     Type: ClientCommandType.Set,
-        //     Key: userInputKey,
-        //     Value: userInputValue,
-        //     RespondToClient: async (success, leaderId) =>
-        //     {
-        //         commandStatus = $"response was {success}, leader is {leaderId}";
-        //     }
-        // );
     }
 
     void startSimulation() {
