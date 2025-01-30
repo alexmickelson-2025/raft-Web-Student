@@ -40,6 +40,54 @@ else
             else {
                 <button class="btn btn-outline-dark" onclick="pause(@node)">Pause</button>
             }
+            <div class="p-3">
+                <h3>Display the current state machine state on each node</h3>
+                @if(node.StateDictionary.Count == 0) {
+                    <p>No data in state dictionary yet</p>
+                }
+                else {
+                    <table class="table-striped">
+                        <thead>
+                            <tr>
+                                <td>Key</td>
+                                <td>Value</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in node.StateDictionary) {
+                                <tr>
+                                    <td>@item.Key</td>
+                                    <td>@item.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+               
+                <p>Highest committed index is: @node.HighestCommittedIndex</p>
+
+                <h5>Committed Logs (@node.HighestCommittedIndex):</h5>
+                @for(int i = 0; i < node.HighestCommittedIndex; i++) {
+                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
+                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
+                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
+                    <p>Current Term: @node.LogBook[i].TermNumber</p>
+                    <p>Log is committed</p>
+                }
+
+                <h5>Uncommitted Logs: (@(node.LogBook.Count() - node.HighestCommittedIndex))</h5>
+                <p>Have count @node.LogBook.Count()</p>
+
+                @for (int i = @node.HighestCommittedIndex; i < node.HighestCommittedIndex; i++) {
+                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
+                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
+                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
+                    <p>Current Term: @node.LogBook[i].TermNumber</p>
+                    <p>Log is <i>NOT</i> committed</p>
+                }
+            </div>
         </div>
     }
 </div>

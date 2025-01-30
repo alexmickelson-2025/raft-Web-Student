@@ -18,7 +18,6 @@ namespace library
         public Dictionary<IServer, int> NextIndex { get; set; }
         int HighestCommittedIndex { get; set; }
         public Dictionary<string, string> StateDictionary { get; set; }
-
         void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null);
         void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request); //delete this one in a minute
         void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request);

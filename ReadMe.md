@@ -1,4 +1,13 @@
 
+## Raft Log Web Simulation Requirements:
+- [ 1/2] Display the current state machine state on each node  
+- [ 1/2] Be able to visualize the list of log journal entries on each node
+- [x] Display the commit index for each node
+- [ 1/2] Display the log index and term id of each entry
+- [x] Indicate if a log entry is committed or not
+- [ ] Be able to send a "set" command with a key and a value to any node (not just leaders, non-leaders should always return false).
+- [ ] Display the response from that node.
+
 ## Raft Log Test Cases
 ~~1) when a leader receives a client command the leader sends the log entry in the next appendentries RPC to all nodes??~~ done, although will need better specificity later to send only new log entries (not those already sent)
 ~~2) when a leader receives a command from the client, it is appended to its log~~ (ALTHOUGH i DON'T REALLY TALK ABOUT indexes making sure those are consistent yet) 
