@@ -79,12 +79,13 @@ else
                 <h5>Uncommitted Logs: (@(node.LogBook.Count() - node.HighestCommittedIndex))</h5>
                 <p>Have count @node.LogBook.Count()</p>
 
-                @for (int i = @node.HighestCommittedIndex; i < node.HighestCommittedIndex; i++) {
+                @for (int i = @node.HighestCommittedIndex; i < node.LogBook.Count(); i++) {
                     <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
                     <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
                     <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
                     <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
                     <p>Current Term: @node.LogBook[i].TermNumber</p>
+                    <p>Command: @node.LogBook[i].Command.Item1 =>  @node.LogBook[i].Command.Item2</p>
                     <p>Log is <i>NOT</i> committed</p>
                 }
             </div>
