@@ -236,12 +236,13 @@ public class Server : IServer
 
     public void SendHeartbeatToAllNodes()
     {
-        Console.WriteLine("sending heartbeat to all nodes now");
+        // Console.WriteLine("sending heartbeat to all nodes now");
         foreach (var server in OtherServersList)
         {
             if (this.LogBook.Count > 0)
             {
                 server.ReceiveAppendEntriesLogFrom(this, this.LogBook[0]); //Todo: obviously this can't send the first entry every time
+                //I think instead this could be this.logBook[serverNextIndex[server]] so we track the next log index for  that server.
             }
             server.ReceiveAppendEntriesLogFrom(this, 1, this.CurrentTerm);
         }
@@ -272,21 +273,7 @@ public class Server : IServer
                 StartElection();
                 break;
             }
-
-            //TODO: fix this
-            //Note: I think my other two tests might need to just each have at least one other node in their cluster, and that would automatically stop them from breaking
-            //because then they wouldn't instantly be winnign the election.
-            //THis right here is the code that was breaking the other two tests. I think it's because 
-            //else if (haveMajorityOfVotes())
-            //{
-            //    //We won the election, so we need to start the right timers
-            //    this.State = States.Leader;
-            //    //this.SendHeartbeatToAllNodes(); //I want to put this in, but I have a test for it passing elsewhere, so I want to check on that.
-            //    //this.timeSinceLastSentHeartbeatAsLeader.Reset();
-            //    break;
-            //}
         }
-       // throw new NotImplementedException();
     }
 
     public void StartBackgroundTaskToDetermineIfWeJustWonAnElection()
