@@ -16,6 +16,24 @@ logger.LogInformation("Node ID {name}", nodeId);
 logger.LogInformation("Other nodes environment config: {}", otherNodesRaw);
 
 app.MapGet("/", () => "Hello World!");
-app.MapGet("/health", () => "raft web app is healthy");
+app.MapGet("/health", () => {
+    Console.WriteLine($"called health check on node {nodeId}");
+    return "raft web app is healthy";
+});
+
+app.MapGet("/nodeData", () =>
+{
+  return new NodeData(
+    Id: node.Id,
+    Status: node.Status,
+    ElectionTimeout: node.ElectionTimeout,
+    Term: node.CurrentTerm,
+    CurrentTermLeader: node.CurrentTermLeader,
+    CommittedEntryIndex: node.CommittedEntryIndex,
+    Log: node.Log,
+    State: node.State,
+    NodeIntervalScalar: RaftNode.NodeIntervalScalar
+  );
+});
 
 app.Run();
