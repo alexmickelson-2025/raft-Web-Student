@@ -465,9 +465,12 @@ public class ServerElectionTests
         willLose.State = States.Candidate;
         Server alreadyLeader = new();
         alreadyLeader.CurrentTerm = 3;
+        alreadyLeader.LogBook.Add(new RaftLogEntry { PreviousLogTerm = 3, PreviousLogIndex = -1});
+        alreadyLeader.LogBook.Add(new RaftLogEntry { PreviousLogTerm = 3, PreviousLogIndex = 0});
+        alreadyLeader.LogBook.Add(new RaftLogEntry { PreviousLogTerm = 3, PreviousLogIndex = 1});
 
         //Act
-        willLose.ReceiveAppendEntriesLogFrom(alreadyLeader, 100, alreadyLeader.CurrentTerm); //because the leader has the same term we must forfeit the election
+        willLose.ReceiveAppendEntriesLogFrom(alreadyLeader, 2, alreadyLeader.CurrentTerm); //because the leader has the same term we must forfeit the election
 
         //Assert
         Assert.Equal(States.Follower, willLose.State);
