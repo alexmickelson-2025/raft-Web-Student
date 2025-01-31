@@ -56,4 +56,48 @@ app.MapGet("/nodeData", () =>
   };
 });
 
+//Appending Entries
+app.MapPost("/request/appendEntries", async (RaftLogEntry request, int serverRequestingId) =>
+{
+  logger.LogInformation("received append entries request {request}", request);
+  //await node.RequestAppendEntries(request);
+  IServer? serverRequesting = otherNodes.Where(n => n.Id == serverRequestingId).FirstOrDefault();
+  node.ReceiveAppendEntriesLogFrom(serverRequesting, request);
+  await Task.CompletedTask;
+});
+ 
+app.MapPost("/response/appendEntries", async (AppendEntryResponse response, int respondingServerId) =>
+{
+  logger.LogInformation("received append entries response {response}", response);
+  // await node.RespondAppendEntries(response);
+  IServer? serverResponding = otherNodes.Where(n => n.Id == respondingServerId).FirstOrDefault();
+  node.ReceiveAppendEntriesLogResponseFrom(serverResponding, response);
+});
+
+//Voting
+app.MapPost("/request/vote", async (RaftLogEntry discard) =>
+{
+  logger.LogInformation("received vote request {request}", discard);
+  //await node.RequestVote(request);
+  foreach (var server in otherNodes) {
+    node.SendRequestForVoteRPCTo(server);
+  }
+});
+ 
+ 
+app.MapPost("/response/vote", async (AppendEntryResponse response, int respondingServerId) =>
+{
+  logger.LogInformation("received vote response {response}", response);
+  //await node.ResponseVote(response);
+  IServer? serverResponding = otherNodes.Where(n => n.Id == respondingServerId).FirstOrDefault();
+  node.ReceiveVoteResponseFrom(serverResponding, response.TermNumber, response.Accepted);
+});
+ 
+//Client Command
+app.MapPost("/request/command", async ((string, string) data) =>
+{
+  //await node.SendCommand(data);
+  node.ReceiveClientCommand(data);
+});
+
 app.Run();
