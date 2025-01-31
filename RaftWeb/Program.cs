@@ -17,11 +17,11 @@ builder.Services.AddLogging();
 var app = builder.Build();
 var logger = app.Services.GetService<ILogger<Program>>();
 
-
-IServer[] otherNodes = otherNodesRaw
-  .Split(";")
-  .Select(s => new HttpRpcToAnotherNode(int.Parse(s.Split(",")[0]), s.Split(",")[1]))
-  .ToArray();
+IServer[] otherNodes = [];
+// IServer[] otherNodes = otherNodesRaw
+//   .Split(";")
+//   .Select(s => new HttpRpcToAnotherNode(int.Parse(s.Split(",")[0]), s.Split(",")[1]))
+//   .ToArray();
 
 logger.LogInformation("other nodes {nodes}", JsonSerializer.Serialize(otherNodes));
  

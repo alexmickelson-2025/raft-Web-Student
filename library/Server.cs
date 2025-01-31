@@ -49,6 +49,8 @@ public class Server : IServer
 
     public Server(bool TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt, bool TrackTimeAtWhichLeaderShouldSendHeartbeats)
     {
+        Console.WriteLine("called constructor to turn on a server");
+
         ElectionTimeoutAdjustmentFactor = 1;
         NetworkDelay = 0;
         this.State = States.Follower;
@@ -68,12 +70,14 @@ public class Server : IServer
 
     public void ResetElectionTimeout()
     {
+        Console.WriteLine("Reset election timeout was called");
         int val = (Random.Shared.Next() % 150) + 150;
         ElectionTimeout = val * ElectionTimeoutAdjustmentFactor;
     }
 
     public void SendAppendEntriesLogTo(IServer follower)
     {
+        Console.WriteLine("Called Send Append Entries Log To function");
         //make a new appendEntriesLog to pass along
         RaftLogEntry raftLogEntry = new RaftLogEntry()
         {

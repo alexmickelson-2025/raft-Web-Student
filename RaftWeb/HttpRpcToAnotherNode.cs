@@ -2,19 +2,19 @@ using library;
 public class HttpRpcToAnotherNode : IServer {
     public int Id { get; }
     public string Url { get; }
-    public bool IsPaused { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    int IServer.Id { get => Id; set => throw new NotImplementedException(); }
-    public States State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public int CurrentTerm { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public int ElectionTimeout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public int ElectionTimeoutAdjustmentFactor { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public int NetworkDelay { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public IServer? RecognizedLeader { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public List<RaftLogEntry> LogBook { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public List<IServer> OtherServersList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public Dictionary<IServer, int> NextIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public int HighestCommittedIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public Dictionary<string, string> StateDictionary { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public bool IsPaused {get;set; }
+    int IServer.Id {get; set; }
+    public States State {get; set; }
+    public int CurrentTerm {get; set; }
+    public int ElectionTimeout {get; set; }
+    public int ElectionTimeoutAdjustmentFactor {get; set; }
+    public int NetworkDelay {get; set; }
+    public IServer? RecognizedLeader {get; set; }
+    public List<RaftLogEntry> LogBook {get; set; }
+    public List<IServer> OtherServersList {get; set; }
+    public Dictionary<IServer, int> NextIndex {get; set; }
+    public int HighestCommittedIndex {get; set; }
+    public Dictionary<string, string> StateDictionary {get; set; }
 
     private HttpClient client = new();
 
@@ -41,7 +41,15 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
-        throw new NotImplementedException();
+        try
+        {
+            client.PostAsJsonAsync(Url + "/response/appendEntries", response);
+            //await client.PostAsJsonAsync(Url + "/response/appendEntries", response);
+        }
+        catch (HttpRequestException)
+        {
+            Console.WriteLine($"node {Url} is down");
+        }
     }
 
     public void ReceiveClientCommand((string, string) v)
