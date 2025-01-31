@@ -38,7 +38,6 @@ logger.LogInformation("Other nodes environment config: {}", otherNodesRaw);
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet("/health", () => {
-    Console.WriteLine($"called health check on node {nodeId}");
     return "raft web app is healthy";
 });
 

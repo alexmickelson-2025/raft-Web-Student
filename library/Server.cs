@@ -184,6 +184,7 @@ public class Server : IServer
 
     public void StartElection()
     {
+        Console.WriteLine($"Starting Election, from term {this.CurrentTerm} to term {this.CurrentTerm +1}");
         this.VotesReceived = [this];
         this.State = States.Candidate;
         this.CurrentTerm++;
@@ -335,10 +336,9 @@ public class Server : IServer
 
     public void StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()
     {
+        Console.WriteLine("Called StartBackgroundTaskToMonitorTimeSinceHearingFromLeader")
         //NOTE: this is for FOLLOWER state and for time since we received communication and has NOTHING to do with being a candidate in an election
        
-        //do I want the same stopwatch as the one I use to monitor if I haven't heard from the leader  yet? But that's what resetting the state when I get a message from the leader does.
-        //Otherwise I worry that maybe we'll keep trying to start an election all over again
         while (true)
         {
             //Hypothesis: Perhaps the 
