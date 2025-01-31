@@ -183,7 +183,7 @@ public class ServerElectionTests
         candidate.CurrentTerm = 2;
         candidate.State = States.Candidate;
 
-        Server newLeader = new();
+        var newLeader = Substitute.For<IServer>();
         newLeader.CurrentTerm = 13;
 
         //Act
@@ -196,12 +196,6 @@ public class ServerElectionTests
 
         //Assert
         Assert.Equal(States.Follower, candidate.State);
-
-        //Notes on why this is failing:
-        //It blows up on the commitEntry function
-        //However, when I step through in the debugger I can see that we are indeed appending the entry to our log the logbook now has one item in it
-        //but when we get to the commitEntry function my logbook is completely empty
-        //am I mixing up references and passing the wrong server then? I'm not completely sure.
     }
 
     //Testing #11

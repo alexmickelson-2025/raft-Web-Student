@@ -182,6 +182,14 @@ else
         var node3 = new Server(true, true);
         node3.Id = 3;
 
+        node1.LogBook.Add(new RaftLogEntry { PreviousLogIndex = -1, Command=("", "") });
+        node2.LogBook.Add(new RaftLogEntry { PreviousLogIndex = -1, Command=("", "") });
+        node3.LogBook.Add(new RaftLogEntry { PreviousLogIndex = -1, Command=("", "") });
+        node1.HighestCommittedIndex = 0;
+        node2.HighestCommittedIndex = 0;
+        node3.HighestCommittedIndex = 0;
+        
+
         // node1.State = States.Leader;
 
         var simulation1 = new SimulationNode(node1);
