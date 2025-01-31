@@ -248,6 +248,7 @@ public class Server : IServer
 
     public void WinElection()
     {
+        Console.WriteLine("Winning an election now");
         this.SendHeartbeatToAllNodes();
         this.State = States.Leader;
         //TODO: is this what we want to do? setting recognized leader to null??
@@ -289,6 +290,7 @@ public class Server : IServer
 
     public void StartBackgroundTaskToDetermineIfWeJustWonAnElection()
     {
+        Console.WriteLine("Starting background thread to wait for news of winnign election");
         while(true)
         {
             if (State == States.Candidate)
@@ -336,7 +338,7 @@ public class Server : IServer
 
     public void StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()
     {
-        Console.WriteLine("Called StartBackgroundTaskToMonitorTimeSinceHearingFromLeader")
+        Console.WriteLine("Called StartBackgroundTaskToMonitorTimeSinceHearingFromLeader");
         //NOTE: this is for FOLLOWER state and for time since we received communication and has NOTHING to do with being a candidate in an election
        
         while (true)
