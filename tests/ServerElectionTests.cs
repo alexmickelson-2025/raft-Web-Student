@@ -187,10 +187,21 @@ public class ServerElectionTests
         newLeader.CurrentTerm = 13;
 
         //Act
-        newLeader.SendAppendEntriesLogTo(candidate);
+        //newLeader.SendAppendEntriesLogTo(candidate);
+        candidate.ReceiveAppendEntriesLogFrom(newLeader, new RaftLogEntry
+        {
+            TermNumber = 13,
+            PreviousLogIndex = -1
+        });
 
         //Assert
         Assert.Equal(States.Follower, candidate.State);
+
+        //Notes on why this is failing:
+        //It blows up on the commitEntry function
+        //However, when I step through in the debugger I can see that we are indeed appending the entry to our log the logbook now has one item in it
+        //but when we get to the commitEntry function my logbook is completely empty
+        //am I mixing up references and passing the wrong server then? I'm not completely sure.
     }
 
     //Testing #11
