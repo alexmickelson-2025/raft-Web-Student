@@ -59,12 +59,12 @@ public class Server : IServer
         if (TrackTimeSinceHearingFromLeaderAndStartElectionBecauseOfIt) {
             this.ResetElectionTimeout();
             this.timeSinceHearingFromLeader.Start();
-            new Thread(() => StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()) { IsBackground = true }.Start();
+            new Thread(() => StartBackgroundTaskToMonitorTimeSinceHearingFromLeaderAndStartNewElection()).Start();
         }
         if (TrackTimeAtWhichLeaderShouldSendHeartbeats)
         {
             //TODO: One day, I think I could turn this from just listening for a leader state to just one "listen for all states" that combines them or starts the three different threads
-            new Thread(() => ListenForLeaderState()) { IsBackground =true }.Start();
+            new Thread(() => ListenForLeaderState()).Start();
         }
     }
 
@@ -189,14 +189,14 @@ public class Server : IServer
         this.State = States.Candidate;
         this.CurrentTerm++;
         //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
-        //new Thread(() => NameOfYourMethod()) { IsBackground = true }.Start();
-        new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()) { IsBackground = true }.Start();
-        new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()) { IsBackground = true }.Start(); //Did we win?
+        //new Thread(() => NameOfYourMethod()).Start();
+        new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()).Start();
+        new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()).Start(); //Did we win?
     }
 
     public void SendRequestForVoteRPCTo(IServer server)
     {
-        new Thread(() => server.ReceiveVoteRequestFrom(this, this.CurrentTerm)) { IsBackground = true }.Start();
+        new Thread(() => server.ReceiveVoteRequestFrom(this, this.CurrentTerm)).Start();
         //server.ReceiveVoteRequestFrom(this, this.CurrentTerm);
     }
 

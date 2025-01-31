@@ -1,9 +1,8 @@
 using library;
 public class HttpRpcToAnotherNode : IServer {
-    public int Id { get; }
+    public int Id { get;set; }
     public string Url { get; }
     public bool IsPaused {get;set; }
-    int IServer.Id {get; set; }
     public States State {get; set; }
     public int CurrentTerm {get; set; }
     public int ElectionTimeout {get; set; }
@@ -52,19 +51,40 @@ public class HttpRpcToAnotherNode : IServer {
         }
     }
 
-    public void ReceiveClientCommand((string, string) v)
+    public void ReceiveClientCommand((string, string) data)
     {
-        throw new NotImplementedException();
+        client.PostAsJsonAsync(Url + "/request/command", data);
     }
 
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
-    {
+    { 
         throw new NotImplementedException();
+        // try
+        // {
+        //     client.PostAsJsonAsync(Url + "/request/vote", request);
+        // }
+        //     catch (HttpRequestException)
+        // {
+        // Console.WriteLine($"node {Url} is down");
+        // }
     }
 
     public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
     {
-        throw new NotImplementedException();
+        var response = new AppendEntryResponse {
+            TermNumber = requestedVoteCurrentTerm,
+            LogIndex = 1, //TODO: I don't know what to do for the log index here
+            Accepted = voteGiven
+        };
+
+        try
+        {
+            client.PostAsJsonAsync(Url + "/response/vote", response);
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"node {Url} is down, error {e.Message}");
+        }
     }
 
     public void ResetElectionTimeout()

@@ -15,7 +15,7 @@ public class PauseNodesInClassTests
     public void CanPauseNode()
     {
         //Arrange
-        IServer server = new Server(true, true); //so it has all functionality
+        Server server = new Server(true, true); //so it has all functionality
         server.State = States.Leader;
         IServer follower1 = Substitute.For<IServer>();
         IServer follower2 = Substitute.For<IServer>();

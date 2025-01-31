@@ -70,7 +70,7 @@ app.MapPost("/response/appendEntries", async (AppendEntryResponse response, int 
 {
   logger.LogInformation("received append entries response {response}", response);
   // await node.RespondAppendEntries(response);
-  IServer? serverResponding = otherNodes.Where(n => n.Id == respondingServerId).FirstOrDefault();
+  IServer? serverResponding = otherNodes.First(n => n.Id == respondingServerId);
   node.ReceiveAppendEntriesLogResponseFrom(serverResponding, response);
 });
 
