@@ -236,6 +236,7 @@ public class Server : IServer
 
     public void SendHeartbeatToAllNodes()
     {
+        Console.WriteLine("sending heartbeat to all nodes now");
         foreach (var server in OtherServersList)
         {
             if (this.LogBook.Count > 0)
