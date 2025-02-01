@@ -147,6 +147,9 @@ public class ServerElectionTests
         //Arrange
         Server follower = new();
         Server leader = new();
+        //var leader = Substitute.For<Server>();
+        leader.LogBook.Add(new RaftLogEntry { LogIndex = 0 });
+        leader.LogBook.Add(new RaftLogEntry { LogIndex = 1 });
         follower.CurrentTerm = 2;
 
         //Act
@@ -167,18 +170,25 @@ public class ServerElectionTests
         Server follower = new();
         follower.CurrentTerm = 13; //I just need it to be less than or equal to the term the request is sent on so we don't reject the request and not reset the timer.
         follower.timeSinceHearingFromLeader.Start();
-        Server leader = new();
-
+        //Server leader = new();
+        var leader = Substitute.For<Server>();
+        follower.LogBook.Add(new RaftLogEntry {LogIndex = 0 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 1 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 2 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 3 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 4 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 5 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 6 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 7 });
         //Act
         Thread.Sleep(301); //because normally by 300 ms this would for sure start an election, but here we need to reset the election timer when we receive the request.
-        follower.ReceiveAppendEntriesLogFrom(leader, 15, 15);
+        follower.ReceiveAppendEntriesLogFrom(leader, 7, 15);
 
         //Assert
         //I do less than 40 because it may take some time to reset it but it certainly won't be 300 like it was before
         var time = follower.timeSinceHearingFromLeader.ElapsedMilliseconds;
         Assert.True(follower.timeSinceHearingFromLeader.ElapsedMilliseconds >= 0 && follower.timeSinceHearingFromLeader.ElapsedMilliseconds < 40);
         //Idea for the future we could also ensure the reset timer function was called.
-        //I could also wrap the stopwatch in a class that would be easier to mock out. I think that actually would be a better way to test it??
     }
 
     //Testing #12

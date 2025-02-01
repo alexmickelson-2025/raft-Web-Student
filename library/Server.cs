@@ -88,7 +88,7 @@ public class Server : IServer
            // LogIndex = this.LogBook.Count + 1 //Why do I need this to be plus 1? can I just do the count??? 
             //TODO: I'm not sure what to do about the log index. Is it really just the next available spot in the log book?
         };
-        follower.ReceiveAppendEntriesLogFrom(this, raftLogEntry);
+        follower.ReceiveAppendEntriesLogFrom(this, [raftLogEntry]);
         //follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm, raftLogEntry); //I need to be able to automatically increment this
     }
     public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request) //delete this one in a minute
@@ -242,7 +242,7 @@ public class Server : IServer
         {
             if (this.LogBook.Count > 0)
             {
-                server.ReceiveAppendEntriesLogFrom(this, this.LogBook[0]); //Todo: obviously this can't send the first entry every time
+                server.ReceiveAppendEntriesLogFrom(this, [this.LogBook[0]]); //Todo: obviously this can't send the first entry every time
                 //I think instead this could be this.logBook[serverNextIndex[server]] so we track the next log index for  that server.
             }
             server.ReceiveAppendEntriesLogFrom(this, 1, this.CurrentTerm);

@@ -72,7 +72,7 @@ public class SimulationNode: IServer {
 
     public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
     {
-        ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, request);
+        ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, [request]);
     }
 
     public void ReceiveClientCommand((string, string) v)
