@@ -104,9 +104,17 @@ public class ServerElectionTests
         //Arrange
         Server leader = new();
         Server follower = new();
+        var entry = new RaftLogEntry
+        {
+            PreviousLogIndex = -1,
+            TermNumber = 0
+        };
+        leader.LogBook.Add(entry);
 
+        
         //Act
-        leader.SendAppendEntriesLogTo(follower);
+        //leader.SendAppendEntriesLogTo(follower); //I'm realizing that nowhere in my server code actually references this. so maybe I should test a different way
+        follower.ReceiveAppendEntriesLogFrom(leader, entry);
 
         //Assert
         Assert.Equal(leader, follower.RecognizedLeader);

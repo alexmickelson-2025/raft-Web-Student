@@ -84,7 +84,8 @@ public class Server : IServer
             Command = ("", ""),
             LeaderHighestCommittedIndex = this.HighestCommittedIndex,
             TermNumber = this.CurrentTerm,
-            LogIndex = this.LogBook.Count + 1
+            LogIndex = this.LogBook.Count//Todo this is the line I changed
+           // LogIndex = this.LogBook.Count + 1 //Why do I need this to be plus 1? can I just do the count??? 
             //TODO: I'm not sure what to do about the log index. Is it really just the next available spot in the log book?
         };
         follower.ReceiveAppendEntriesLogFrom(this, raftLogEntry);
@@ -166,7 +167,7 @@ public class Server : IServer
         //Let's also add something to see if we have received a majority of responses and can commit the log
         if (AppendEntriesResponseLog[response.LogIndex].Count >= (OtherServersList.Count / 2 + 1)) //Because then we have a majority of responses.
         {
-            CommitEntry(response.LogIndex); //this will call increment highest ccommitted index, and apply entry
+            CommitEntry(response.LogIndex); //this will call increment highest ccommitted index, and apply entry. I'm noticing here I'm passing it too high of a log index
         }
         //ReceiveAppendEntriesLogResponseFrom(server, response.LogIndex, response.Accepted);
     }
@@ -466,7 +467,7 @@ public class Server : IServer
 
     public void CommitEntry(int logIndex)
     {
-        ApplyEntry(LogBook[logIndex]);
+        ApplyEntry(LogBook[logIndex]); //This is where it breaks, we're passing it the wrong log index
         IncrementHighestCommittedIndex();
     }
 

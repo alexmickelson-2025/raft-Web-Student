@@ -63,7 +63,7 @@ public class HttpRpcToAnotherNode : IServer {
         // {
         //     client.PostAsJsonAsync(Url + "/request/vote", request);
         // }
-        //     catch (HttpRequestException)
+        // catch (HttpRequestException)
         // {
         // Console.WriteLine($"node {Url} is down");
         // }
