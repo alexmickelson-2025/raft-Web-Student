@@ -25,21 +25,25 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
+        Console.WriteLine("not implemented exception in the receive Append entries log from function");
         throw new NotImplementedException();
     }
 
     public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
     {
+        Console.WriteLine("not implemented exception in the receive Append entries log from function");
         throw new NotImplementedException();
     }
 
     public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request)
     {
+        Console.WriteLine("not implemented exception in the receive Append entries log from function");
         throw new NotImplementedException();
     }
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
+        Console.WriteLine("about to make http call to receive append entries log response from ");
         try
         {
             client.PostAsJsonAsync(Url + "/response/appendEntries", response);
@@ -53,11 +57,13 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveClientCommand((string, string) data)
     {
+        
         client.PostAsJsonAsync(Url + "/request/command", data);
     }
 
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
-    { 
+    {
+        Console.WriteLine("not implemented exception ReceiveVoteRequestFrom");
         throw new NotImplementedException();
         // try
         // {
