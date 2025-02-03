@@ -14,4 +14,9 @@ Welcome to your new app. This front end shows node status
 
 @code {
     string[] Urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
+
+    protected override void OnInitialized() {
+        Console.WriteLine("Loading page, trying to parse urls");
+        Console.WriteLine("Urls has count " + Urls?.Count() ?? "null");
+    }
 }
