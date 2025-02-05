@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using library;
 public class HttpRpcToAnotherNode : IServer {
     public int Id { get;set; }
@@ -35,10 +36,18 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
+    //Rachel note: This is the version of the function I plan to keep (the other overloads are going to be removed)
+    //Question for Alex: What do I do with the other functions that this one calls? Can I just implement them through inner node type of style?
     public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request)
     {
-        Console.WriteLine("not implemented exception in the receive Append entries log from function");
-        throw new NotImplementedException();
+        Console.WriteLine("Trying to make post request for a node to receive an append entries log");        
+        //make an http call to this endpoint so that for another node it can call its personal node function (in its program.cs mapped endpoint)
+        try {
+            client.PostAsJsonAsync(Url + "/request/appendEntries", request);
+        }
+        catch (Exception e) {
+            Console.WriteLine("Error making post reequest for receive append entries " + e.Message);
+        }
     }
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)

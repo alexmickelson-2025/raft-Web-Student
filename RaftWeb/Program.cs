@@ -1,6 +1,5 @@
 using System.Text.Json;
 using library;
-using NodeDataClass;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8080");
@@ -60,16 +59,14 @@ app.MapGet("/nodeData", () =>
 app.MapPost("/request/appendEntries", async (RaftLogEntry request, int serverRequestingId) =>
 {
   logger.LogInformation("received append entries request {request}", request);
-  //await node.RequestAppendEntries(request);
   IServer? serverRequesting = otherNodes.Where(n => n.Id == serverRequestingId).FirstOrDefault();
-  node.ReceiveAppendEntriesLogFrom(serverRequesting, request);
+  node.ReceiveAppendEntriesLogFrom(serverRequesting, [request]);
   await Task.CompletedTask;
 });
  
 app.MapPost("/response/appendEntries", async (AppendEntryResponse response, int respondingServerId) =>
 {
   logger.LogInformation("received append entries response {response}", response);
-  // await node.RespondAppendEntries(response);
   IServer? serverResponding = otherNodes.First(n => n.Id == respondingServerId);
   node.ReceiveAppendEntriesLogResponseFrom(serverResponding, response);
 });
