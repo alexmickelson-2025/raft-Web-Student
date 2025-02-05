@@ -1,5 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using System.Collections.Concurrent
+@using library
 
 <PageTitle>Home</PageTitle>
 
@@ -9,14 +11,127 @@
         <p>Url @url</p>
     }
 }
+else {
+    <div>Urls is null</div>
+}
 
-Welcome to your new app. This front end shows node status 
+<p>Welcome to your new app. This front end shows node status </p>
+
+@* This is where i displayed node status *@
+@* <div class="row">
+    @foreach(var node in data) {
+        <div class="p-3 col-4 row">
+            <div class="@StateClass(node) border p-3 rounded">
+                <p>Node @node.Id</p>
+                <p>Term @node.CurrentTerm</p>
+                <p>State @node.State</p>
+                <p>Current leader @node?.RecognizedLeader?.Id</p>
+                <p>Election Timeout @node?.ElectionTimeout miliseconds</p>
+                @if (node?.State != States.Leader) {
+                    <p>Time since hearing from leader @node?.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds</p>
+                    <p>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</p>
+                }
+            </div>
+            @if(node.IsPaused) {
+                <button class="btn btn-outline-dark" onclick="">Resume</button>
+            }
+            else {
+                <button class="btn btn-outline-dark" onclick="pause(@node)">Pause</button>
+            }
+            <div class="p-3">
+                <h3>Display the current state machine state on each node</h3>
+                @if(node.StateDictionary.Count == 0) {
+                    <p>No data in state dictionary yet</p>
+                }
+                else {
+                    <table class="table-striped">
+                        <thead>
+                            <tr>
+                                <td>Key</td>
+                                <td>Value</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in node.StateDictionary) {
+                                <tr>
+                                    <td>@item.Key</td>
+                                    <td>@item.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <p>Highest committed index is: @node.HighestCommittedIndex</p>
+
+                <h5>Committed Logs (@node.HighestCommittedIndex):</h5>
+                @for(int i = 0; i < node.HighestCommittedIndex; i++) {
+                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
+                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
+    using System.Diagnostics.Eventing.Reader;
+                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
+                    <p>Current Term: @node.LogBook[i].TermNumber</p>
+                    <p>Log is committed</p>
+                }
+
+                <h5>Uncommitted Logs: (@(node.LogBook.Count() - node.HighestCommittedIndex))</h5>
+                <p>Have count @node.LogBook.Count()</p>
+
+                @for (int i = @node.HighestCommittedIndex; i < node.LogBook.Count(); i++) {
+                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
+                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
+                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
+                    <p>Current Term: @node.LogBook[i].TermNumber</p>
+                    <p>Command: @node.LogBook[i].Command.Item1 =>  @node.LogBook[i].Command.Item2</p>
+                    <p>Log is <i>NOT</i> committed</p>
+                }
+            </div>
+        </div>
+    }
+</div> *@
 
 @code {
+    ConcurrentDictionary<string, NodeData> data = [];
+    string TermClass(NodeData node) =>   "";
     string[] Urls = Environment.GetEnvironmentVariable("NODE_URLS").Split(',');
-
+    HttpClient http = new();
+    private Timer? timer;
     protected override void OnInitialized() {
         Console.WriteLine("Loading page, trying to parse urls");
         Console.WriteLine("Urls has count " + Urls?.Count() ?? "null");
+        
+        Timer timer= new Timer(async _ => {
+            await Task.WhenAll(Urls.Select(async url => {
+                try 
+                {
+                    var nodeData= await http.GetFromJsonAsync<NodeData>(url);
+                    if (nodeData != null) {
+                        data[url] = nodeData;
+                    }
+                    else {
+                        Console.WriteLine("did not get data for " + url);
+                    }
+                }
+                catch(HttpRequestException) {
+                    Console.WriteLine($"node {url} is down");
+                    data.TryRemove(url, out var removedNodeData);
+                }
+            }).ToArray()
+            );
+            await InvokeAsync(StateHasChanged);
+        }, null, 0, 200);
+    }
+
+    public string StateClass(IServer node)
+    {
+        if (node.State == States.Leader)
+            return "text-primary";
+        if (node.State == States.Candidate)
+            return "text-warning";
+        if (node.State == States.Follower)
+            return "text-body-secondary";
+        return "";
     }
 }
