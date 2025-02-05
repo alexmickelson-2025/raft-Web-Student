@@ -31,6 +31,23 @@ public class ServerElectionTests
 
     /********************************** *****************/
 
+    [Fact]
+    public void Testing_Why_Leader_Not_Elected_Bug_fix_EnsureFollowersReceiveRequestForVote()
+    {
+        //Arrange
+        Server willBecomeLeader = new Server();
+        willBecomeLeader.CurrentTerm = 2;
+        var follower = Substitute.For<IServer>();
+        willBecomeLeader.OtherServersList.Add(follower);
+
+        //act
+        willBecomeLeader.StartElection();
+
+        //Assert
+        follower.Received(1).ReceiveVoteRequestFrom(willBecomeLeader, 3);
+
+    }
+
     //Testing #3
     //When a new node is initialized, it should be in follower state.
     [Fact]
@@ -172,7 +189,7 @@ public class ServerElectionTests
         follower.timeSinceHearingFromLeader.Start();
         //Server leader = new();
         var leader = Substitute.For<Server>();
-        follower.LogBook.Add(new RaftLogEntry {LogIndex = 0 });
+        follower.LogBook.Add(new RaftLogEntry { LogIndex = 0 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 1 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 2 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 3 });

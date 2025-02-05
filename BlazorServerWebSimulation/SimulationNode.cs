@@ -60,11 +60,6 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).WinElection();
     }
 
-    public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
-    {
-        throw new NotImplementedException();
-    }
-
     public void SendRequestForVoteRPCTo(IServer server)
     {
         throw new NotImplementedException();
@@ -128,6 +123,11 @@ public class SimulationNode: IServer {
     public void CommitEntry(int logIndex)
     {
         ((IServer)InnerNode).CommitEntry(logIndex);
+    }
+
+    public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
+    {
+        ((IServer)InnerNode).ReceiveVoteRequestFrom(serverRequesting, requestedVoteCurrentTerm);
     }
 
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}

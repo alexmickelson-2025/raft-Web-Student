@@ -191,6 +191,12 @@ public class Server : IServer
         this.CurrentTerm++;
         //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
         //new Thread(() => NameOfYourMethod()).Start();
+
+        //Rachel note: I think we need to call SendRequestForVoteRPCTo here!
+        foreach (var follower in OtherServersList)
+        {
+            this.SendRequestForVoteRPCTo(follower);
+        }
         new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()).Start();
         new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()).Start(); //Did we win?
     }
@@ -467,6 +473,7 @@ public class Server : IServer
 
     public void CommitEntry(int logIndex)
     {
+        //Rachel next step of place to fix
         ApplyEntry(LogBook[logIndex]); //This is where it breaks, we're passing it the wrong log index
         IncrementHighestCommittedIndex();
     }
