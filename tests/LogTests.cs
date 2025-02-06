@@ -87,10 +87,10 @@ public class LogTests
         leader.ReceiveClientCommand(("myKey", "IncrementBy1")); 
 
         //Step 1 of the assert: assert that if it's not time yet, we don't sent it!
-        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey")));
-        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1")));
-        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey")));
-        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1")));
+        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey"))]);
+        follower1.Received(0).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1"))]);
+        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey"))]);
+        follower2.Received(0).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1"))]);
 
         //Step 2 of the Act:
         //leader.RestartTimeSinceHearingFromLeader();
@@ -98,10 +98,10 @@ public class LogTests
         Thread.Sleep(50); //long enough for a heartbeat to go out
 
         //Step 2 of the Assert:
-        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey")));
-        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1")));
-        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey")));
-        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1"))); //add an item2 in there
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(rle => rle.Command.Item1.Equals("myKey"))]);
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(rle => rle.Command.Item2.Equals("IncrementBy1"))]);
+        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(le => le.Command.Item1.Equals("myKey"))]);
+        follower2.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(le => le.Command.Item2.Equals("IncrementBy1"))]); //add an item2 in there
     }
 
     //Testing Logs #2) when a leader receives a command from the client, it is appended to its log
@@ -195,7 +195,7 @@ public class LogTests
         leader.SendAppendEntriesLogTo(follower1);
 
         //Assert
-        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(log => log.LeaderHighestCommittedIndex.Equals(3)));
+        follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(log => log.LeaderHighestCommittedIndex.Equals(3))]);
     }
 
     //Testing Logs #9) the leader commits logs by incrementing its committed log index
@@ -254,7 +254,7 @@ public class LogTests
         follower.LogBook.Add(logEntry);
 
         //Act
-        follower.ReceiveAppendEntriesLogFrom(leader, logEntry);
+        follower.ReceiveAppendEntriesLogFrom(leader, [logEntry]);
 
         //Assert
         Assert.Equal("Value5", follower.StateDictionary["LetterA"]);
@@ -277,7 +277,7 @@ public class LogTests
         follower.LogBook.Add(logEntry);
 
         //Act
-        follower.ReceiveAppendEntriesLogFrom(leader, logEntry);
+        follower.ReceiveAppendEntriesLogFrom(leader, [logEntry]);
 
         //Assert
         Assert.Empty(follower.StateDictionary); //because since the highest committed index is 0, this should not have been applied.
@@ -510,7 +510,7 @@ public class LogTests
         follower.LogBook.Add(someOldLog);
 
         //Act
-        follower.ReceiveAppendEntriesLogFrom(leader, someLogThatWontMatch);
+        follower.ReceiveAppendEntriesLogFrom(leader, [someLogThatWontMatch]);
 
         //Assert
         leader.Received().ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(reply => reply.Accepted.Equals(false)));
@@ -566,9 +566,9 @@ public class LogTests
 
         //Assert
         //but we will change this so it asserts the previous log entry was received.
-        follower.Received().ReceiveAppendEntriesLogFrom(leader, Arg.Is<RaftLogEntry>(log => log.LogIndex.Equals(1))); 
+        follower.Received().ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(log => log.LogIndex.Equals(1))]); 
         
-        follower.Received().ReceiveAppendEntriesLogFrom(leader, secondLog); 
+        follower.Received().ReceiveAppendEntriesLogFrom(leader, [secondLog]); 
          
     }
 

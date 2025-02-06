@@ -91,10 +91,7 @@ public class Server : IServer
         follower.ReceiveAppendEntriesLogFrom(this, [raftLogEntry]);
         //follower.ReceiveAppendEntriesLogFrom(this, 0, this.CurrentTerm, raftLogEntry); //I need to be able to automatically increment this
     }
-    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request) //delete this one in a minute
-    {
-        ReceiveAppendEntriesLogFrom(leader, [request]);
-    }
+
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         this.RecognizedLeader = server;

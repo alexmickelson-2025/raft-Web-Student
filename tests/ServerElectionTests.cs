@@ -131,7 +131,7 @@ public class ServerElectionTests
         
         //Act
         //leader.SendAppendEntriesLogTo(follower); //I'm realizing that nowhere in my server code actually references this. so maybe I should test a different way
-        follower.ReceiveAppendEntriesLogFrom(leader, entry);
+        follower.ReceiveAppendEntriesLogFrom(leader, [entry]);
 
         //Assert
         Assert.Equal(leader, follower.RecognizedLeader);
@@ -234,11 +234,11 @@ public class ServerElectionTests
 
         //Act
         //newLeader.SendAppendEntriesLogTo(candidate);
-        candidate.ReceiveAppendEntriesLogFrom(newLeader, new RaftLogEntry
+        candidate.ReceiveAppendEntriesLogFrom(newLeader, [new RaftLogEntry
         {
             TermNumber = 13,
             PreviousLogIndex = -1
-        });
+        }]);
 
         //Assert
         Assert.Equal(States.Follower, candidate.State);

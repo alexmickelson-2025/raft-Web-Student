@@ -30,12 +30,6 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
-    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
-    {
-        Console.WriteLine("not implemented exception in the receive Append entries log from function");
-        throw new NotImplementedException();
-    }
-
     //Rachel note: This is the version of the function I plan to keep (the other overloads are going to be removed)
     //Question for Alex: What do I do with the other functions that this one calls? Can I just implement them through inner node type of style?
     public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request)

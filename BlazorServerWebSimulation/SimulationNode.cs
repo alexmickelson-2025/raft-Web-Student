@@ -65,11 +65,6 @@ public class SimulationNode: IServer {
         throw new NotImplementedException();
     }
 
-    public void ReceiveAppendEntriesLogFrom(IServer leader, RaftLogEntry request)
-    {
-        ((IServer)InnerNode).ReceiveAppendEntriesLogFrom(leader, [request]);
-    }
-
     public void ReceiveClientCommand((string, string) v)
     {
         ((IServer)InnerNode).ReceiveClientCommand(v);
