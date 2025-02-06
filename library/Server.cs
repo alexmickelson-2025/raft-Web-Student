@@ -142,6 +142,17 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
+        //RACHEL NOTE: This is the reason some of my tests are breaking. It's because
+        //My test expects to find in the log that the log was rejected
+        //However, what actually happens is that I then just decrement and send the previous one
+
+        //Steps to fix. 
+        //1. Fix other tests first (because we're running into index errors)
+        //3. Then fix the log index errors, as I clearly have a logic error there for starting with an empty log.
+        //4. Account for an edge case where I'm rejecting an append entries, but my log book is empty or it's because they have too old of a term number. 
+        //Perhaps I need to re-read the documentation about that.
+
+
         //If our appendEntriesResponseWasREjected, send the previous one:
         if(!response.Accepted && response.TermNumber <= this.CurrentTerm)
         {
@@ -158,7 +169,7 @@ public class Server : IServer
             AppendEntriesResponseLog.Add(response.LogIndex, new List<IServer>() { server });
             //BUG TODO I crashed here one time adding the same request number twice. Perhaps I need locks on this?
         }
-        else //at least 1 item is already in there, so we must append to the list
+        else //at least 1 item is already in there, so we must append to the list of servers already in there.
         {
             var list = AppendEntriesResponseLog[response.LogIndex];
             list.Add(server);
@@ -189,16 +200,16 @@ public class Server : IServer
         this.VotesReceived = [this];
         this.State = States.Candidate;
         this.CurrentTerm++;
-        //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
-        //new Thread(() => NameOfYourMethod()).Start();
 
-        //Rachel note: I think we need to call SendRequestForVoteRPCTo here!
+        //syntax from this stack overflow article https://stackoverflow.com/questions/4161120/how-should-i-create-a-background-thread
+        new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()).Start();
+        new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()).Start(); //Did we win?
+
+        //We started the threads to listen first, so now we can actually go request a vote from all the servers.
         foreach (var follower in OtherServersList)
         {
             this.SendRequestForVoteRPCTo(follower);
         }
-        new Thread(() => StartBackgroundTaskToMonitorElectionTimeoutAndStartNewElection()).Start();
-        new Thread(() => StartBackgroundTaskToDetermineIfWeJustWonAnElection()).Start(); //Did we win?
     }
 
     public void SendRequestForVoteRPCTo(IServer server)

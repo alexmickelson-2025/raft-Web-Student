@@ -163,19 +163,15 @@ public class ServerElectionTests
     {
         //Arrange
         Server follower = new();
-        Server leader = new();
-        //var leader = Substitute.For<Server>();
-        leader.LogBook.Add(new RaftLogEntry { LogIndex = 0 });
-        leader.LogBook.Add(new RaftLogEntry { LogIndex = 1 });
+        var leader = Substitute.For<IServer>();
         follower.CurrentTerm = 2;
 
         //Act
         //give my server an id too
-        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //request id 1
+        follower.ReceiveAppendEntriesLogFrom(leader, 1, 1);
 
         //Assert
-        //Assert.False(leader.AppendEntriesResponseLog[1]);
-        Assert.Contains(leader, leader.AppendEntriesResponseLog[1]);
+        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Is<AppendEntryResponse>(r => r.Accepted.Equals(false)));
     }
 
     //Testing #7
