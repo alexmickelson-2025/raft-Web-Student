@@ -56,15 +56,15 @@ app.MapGet("/nodeData", () =>
 });
 
 //Appending Entries
-app.MapPost("/request/appendEntries", async (RaftLogEntry request, int serverRequestingId) =>
+app.MapPost("/request/appendEntries", async (RaftLogEntry request) =>
 {
   logger.LogInformation("received append entries request {request}", request);
-  IServer? serverRequesting = otherNodes.Where(n => n.Id == serverRequestingId).FirstOrDefault();
-  node.ReceiveAppendEntriesLogFrom(serverRequesting, [request]);
+  IServer? serverRequesting = otherNodes.Where(n => n.Id == request.FromServerId).FirstOrDefault();
+  node.ReceiveAppendEntriesLogFrom(request.fromServer, [request]);
   await Task.CompletedTask;
 });
  
-app.MapPost("/response/appendEntries", async (AppendEntryResponse response, int respondingServerId) =>
+app.MapPost("/response/appendEntries", (AppendEntryResponse response, int respondingServerId) =>
 {
   logger.LogInformation("received append entries response {response}", response);
   IServer? serverResponding = otherNodes.First(n => n.Id == respondingServerId);

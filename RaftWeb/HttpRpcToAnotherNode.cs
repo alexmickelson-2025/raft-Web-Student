@@ -32,29 +32,36 @@ public class HttpRpcToAnotherNode : IServer {
 
     //Rachel note: This is the version of the function I plan to keep (the other overloads are going to be removed)
     //Question for Alex: What do I do with the other functions that this one calls? Can I just implement them through inner node type of style?
-    public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> request)
+    public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> requests)
     {
         Console.WriteLine("Trying to make post request for a node to receive an append entries log");        
         //make an http call to this endpoint so that for another node it can call its personal node function (in its program.cs mapped endpoint)
+
+        //for now, will remove later:
+        foreach (var req in requests)
+        {
+            req.FromServerId = leader.Id;
+            req.fromServer = leader;
+        }
         try {
-            client.PostAsJsonAsync(Url + "/request/appendEntries", request);
+            client.PostAsJsonAsync(Url + "/request/appendEntries", requests);
         }
         catch (Exception e) {
-            Console.WriteLine("Error making post reequest for receive append entries " + e.Message);
+            Console.WriteLine("Error making post request for receive append entries " + e.Message);
         }
     }
 
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
-        Console.WriteLine("about to make http call to receive append entries log response from ");
+        Console.WriteLine("about to make http call to receive append entries log response from Server " + response.ServerRespondingId.ToString());
         try
         {
             client.PostAsJsonAsync(Url + "/response/appendEntries", response);
-            //await client.PostAsJsonAsync(Url + "/response/appendEntries", response);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException e)
         {
             Console.WriteLine($"node {Url} is down");
+            Console.WriteLine("Error was " + e.Message.ToString());
         }
     }
 

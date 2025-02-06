@@ -61,11 +61,6 @@ public class LogTests
     [Fact]
     public void WhenLeaderReceivesCommandFromClient_LeaderSendsLogEntryInNextAppendEntriesRPCToAllNodes()
     {
-        //Questions to be decided so I can structure my logs appropriately:
-        //What data types/structure do I want?
-        //I need a term. For each term I have an index. So do I want a dictionary of arrays? (where the key in the dictionary is the term, adn the value is an array,
-        //and the index of that array is the particular command? (eg command 0 is at index 0 to "add" and at index 1 is the command "add" and at index 2 we were told "decrement"
-
         //Arrange
         IServer leader = new Server(false, false);
         leader.State = States.Leader;

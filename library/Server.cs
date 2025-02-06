@@ -94,6 +94,20 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
+        //Complete refactor
+        if (logEntry != null)
+        {
+            var request = new RaftLogEntry
+            {
+                LogIndex = requestNumber,
+                TermNumber = requestCurrentTerm
+            };
+            ReceiveAppendEntriesLogFrom(server, [request]);
+            return; //so we don't go on to call ourselves.
+        }
+
+        //end of complete refactor
+
         this.RecognizedLeader = server;
         if (logEntry == null) //This will come out in a minute when we're done removing all other parameters and just receiving a log entry and a server
         {
@@ -399,6 +413,17 @@ public class Server : IServer
         this.RecognizedLeader = leader;
         if (requests == null)
         {
+            //if (requestCurrentTerm < this.CurrentTerm)
+            //{
+            //    this.SendAppendEntriesResponseTo(server, requestNumber, false);
+            //}
+            //else
+            //{
+            //    this.SendAppendEntriesResponseTo(server, requestNumber, true);
+            //    this.State = States.Follower;
+            //    this.timeSinceHearingFromLeader.Reset();
+            //    this.timeSinceHearingFromLeader.Start();
+            //}
             ReceiveAppendEntriesLogFrom((Server)leader, requests.First().LogIndex, requests.First().TermNumber, requests.First());
         }
         else
