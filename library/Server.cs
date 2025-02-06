@@ -483,6 +483,7 @@ public class Server : IServer
 
     public void CommitEntry(int logIndex)
     {
+        var logbook = this.LogBook; //here solely for debugging purposes. I can't tell why log book is empty
         //Rachel next step of place to fix
         ApplyEntry(LogBook[logIndex]); //This is where it breaks, we're passing it the wrong log index
         IncrementHighestCommittedIndex();

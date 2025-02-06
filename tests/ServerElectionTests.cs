@@ -184,9 +184,7 @@ public class ServerElectionTests
         //Arrange
         Server follower = new();
         follower.CurrentTerm = 13; //I just need it to be less than or equal to the term the request is sent on so we don't reject the request and not reset the timer.
-        follower.timeSinceHearingFromLeader.Start();
-        //Server leader = new();
-        var leader = Substitute.For<Server>();
+
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 0 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 1 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 2 });
@@ -195,7 +193,22 @@ public class ServerElectionTests
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 5 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 6 });
         follower.LogBook.Add(new RaftLogEntry { LogIndex = 7 });
+
+
+        var leader = Substitute.For<Server>();
+        leader.LogBook = new List<RaftLogEntry> {
+            new RaftLogEntry { LogIndex = 0 },
+            new RaftLogEntry { LogIndex = 1 },
+            new RaftLogEntry { LogIndex = 2 },
+            new RaftLogEntry { LogIndex = 3 },
+            new RaftLogEntry { LogIndex = 4 },
+            new RaftLogEntry { LogIndex = 5 },
+            new RaftLogEntry { LogIndex = 6 },
+            new RaftLogEntry { LogIndex = 7 }
+        };
+
         //Act
+        follower.timeSinceHearingFromLeader.Start();
         Thread.Sleep(301); //because normally by 300 ms this would for sure start an election, but here we need to reset the election timer when we receive the request.
         follower.ReceiveAppendEntriesLogFrom(leader, 7, 15);
 
