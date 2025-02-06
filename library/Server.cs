@@ -143,8 +143,7 @@ public class Server : IServer
     public void ReceiveAppendEntriesLogResponseFrom(IServer server, AppendEntryResponse response)
     {
         //RACHEL NOTE: This is the reason some of my tests are breaking. It's because
-        //My test expects to find in the log that the log was rejected
-        //However, what actually happens is that I then just decrement and send the previous one
+        //I then just decrement and send the previous one
 
         //Steps to fix. 
         //1. Fix other tests first (because we're running into index errors)

@@ -12,4 +12,5 @@ public class AppendEntryResponse
     public int LogIndex { get; set; }
     public bool Accepted { get; set; } = false;
     public int ServerRespondingId {get;set;}
+    public bool ResendOlderLog { get; set; } = false;
 }

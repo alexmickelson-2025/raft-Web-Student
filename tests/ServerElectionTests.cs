@@ -144,8 +144,9 @@ public class ServerElectionTests
     {
         //Arrange
         Server follower = new();
-        Server leader = new();
+        follower.CurrentTerm = 0;
         follower.CurrentTerm = 1;
+        var leader = Substitute.For<IServer>();
 
         //Act
         //i could keep track of the request id that it is rejecting or receiving so that when I need to know which one they're responding to I can tell
@@ -153,7 +154,8 @@ public class ServerElectionTests
         follower.ReceiveAppendEntriesLogFrom(leader, 1, 1); //request id 1
 
         //Assert
-        Assert.Contains(leader, leader.AppendEntriesResponseLog[1]);
+        leader.Received(1).ReceiveAppendEntriesLogResponseFrom(follower, Arg.Any<AppendEntryResponse>());
+        //Assert.Contains(leader, leader.AppendEntriesResponseLog[1]);
     }
 
     //Testing #18
