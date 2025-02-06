@@ -26,7 +26,7 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
-        Console.WriteLine("not implemented exception in the receive Append entries log from function");
+        Console.WriteLine("ReceiveAppendEntriesLogFrom function with lots of parameters.");
         throw new NotImplementedException();
     }
 
