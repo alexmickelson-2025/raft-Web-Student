@@ -72,10 +72,9 @@ app.MapPost("/response/appendEntries", (AppendEntryResponse response, int respon
 });
 
 //Voting
-app.MapPost("/request/vote", async (RaftLogEntry discard) =>
+app.MapPost("/request/vote", async (VoteRequest request) =>
 {
-  logger.LogInformation("received vote request {request}", discard);
-  //await node.RequestVote(request);
+  logger.LogInformation("received vote request {request}", request);
   foreach (var server in otherNodes) {
     node.SendRequestForVoteRPCTo(server);
   }

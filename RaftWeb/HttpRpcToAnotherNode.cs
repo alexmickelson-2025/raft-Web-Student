@@ -72,20 +72,28 @@ public class HttpRpcToAnotherNode : IServer {
         {
             Console.WriteLine("Received error at Receive client command function ");
             Console.WriteLine($"{e.Message}");
+        }
     }
 
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
-        Console.WriteLine("not implemented exception ReceiveVoteRequestFrom");
-        throw new NotImplementedException();
-        // try
-        // {
-        //     client.PostAsJsonAsync(Url + "/request/vote", request);
-        // }
-        // catch (HttpRequestException)
-        // {
-        // Console.WriteLine($"node {Url} is down");
-        // }
+        Console.WriteLine($"received call for ReceiveVoteRequestFrom and about to send http post request. Term {requestedVoteCurrentTerm}.");
+
+        var request = new VoteRequest()
+        {
+            ServerRequestingVote = serverRequesting,
+            requestingVoteId = serverRequesting.Id,
+            CurrentTerm = requestedVoteCurrentTerm
+        };
+        try
+        {
+            client.PostAsJsonAsync(Url + "/request/vote", request);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"node {Url} is down. Tried to send a post request to request a vote from server {serverRequesting.Id} but got exception: ");
+            Console.WriteLine(ex.Message.ToString());
+        }
     }
 
     public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
