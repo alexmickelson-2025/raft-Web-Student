@@ -16,6 +16,6 @@ public class RaftLogEntry
 
     public int LeaderHighestCommittedIndex { get; set; }
 
-    public IServer fromServer { get; set; }
+    public IServer? fromServer { get; set; }
     public int FromServerId { get; set; }
 }

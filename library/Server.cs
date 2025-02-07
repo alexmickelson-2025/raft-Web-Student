@@ -94,17 +94,23 @@ public class Server : IServer
 
     public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
-        //Complete refactor
-        if (logEntry != null)
-        {
+        ////Complete refactor
+        //if (logEntry != null)
+        //{
             var request = new RaftLogEntry
             {
                 LogIndex = requestNumber,
-                TermNumber = requestCurrentTerm
+                TermNumber = logEntry?.TermNumber ?? requestCurrentTerm,
+                fromServer = server,
+                FromServerId = server.Id,
+                Command = logEntry?.Command ?? ("", ""),
+                PreviousLogIndex = logEntry?.PreviousLogIndex ?? -2, //negative 2 to indicate null/not defined, because a null int defaults to 0
+                PreviousLogTerm = logEntry?.PreviousLogTerm ?? -2,
+                
             };
             ReceiveAppendEntriesLogFrom(server, [request]);
-            return; //so we don't go on to call ourselves.
-        }
+            return; //so we don't go on to call ourselves recursively.
+        //}
 
         //end of complete refactor
 
@@ -413,6 +419,7 @@ public class Server : IServer
         this.RecognizedLeader = leader;
         if (requests == null)
         {
+            throw new Exception("got here and requests was null");
             //if (requestCurrentTerm < this.CurrentTerm)
             //{
             //    this.SendAppendEntriesResponseTo(server, requestNumber, false);
