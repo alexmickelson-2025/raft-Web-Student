@@ -152,20 +152,17 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void SendRequestForVoteRPCTo(IServer server)
     {
-        // //What makes me really nervous is that even when this was just supposed to throw a not implemented exception I never saw one in the logs.
+        VoteRequest request = new() {
+            requestingVoteId = this.Id,
+            CurrentTerm = this.CurrentTerm
+        };
         
-        
-        //Question: Is here where I'm supposed to make an http call to that node? Or do I just call server.ReceiveVoteRequest
-        // AppendEntryResponse response = new() {
-            
-        // };
         try {
-            client.PostAsJsonAsync(Url+"/request/vote", response);
+            client.PostAsJsonAsync(Url+"/request/vote", request);
         }
         catch (Exception e) {
-            Console.WriteLine("Error in SendREquestForVoteRPC to function " + e.Message.ToString());
+            Console.WriteLine("Error in SendRequestForVoteRPC to function " + e.Message.ToString());
         }
-        // throw new NotImplementedException();
     }
 
     public void StartElection()

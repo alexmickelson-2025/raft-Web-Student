@@ -224,7 +224,7 @@ public class Server : IServer
         //We started the threads to listen first, so now we can actually go request a vote from all the servers.
         foreach (var follower in OtherServersList)
         {
-            follower.SendRequestForVoteRPCTo(follower);
+            this.SendRequestForVoteRPCTo(follower);
         }
     }
 
@@ -248,14 +248,13 @@ public class Server : IServer
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))
             {
                 VotesCast.Add(requestedVoteCurrentTerm, serverRequesting);
-                serverRequesting.ReceiveVoteResponseFrom(Id, requestedVoteCurrentTerm, true);
-                // SendVoteResponseTo(serverRequesting, requestedVoteCurrentTerm, true);
+                serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, true);
             }
         }
     }
 
     //todo check term in here
-    public void ReceiveVoteResponseFrom(int requestorId, int requestedVoteCurrentTerm, bool voteGiven)
+    public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
     {
         //find Iserver with id
         if (voteGiven)
