@@ -57,8 +57,7 @@ public class HttpRpcToAnotherNode : IServer {
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"node {Url} is down");
-            Console.WriteLine("Error was " + e.Message.ToString());
+            Console.WriteLine($"node {Url} is down ReceiveAppendEntriesLogResponse. Error was " + e.Message.ToString());
         }
     }
 
@@ -66,12 +65,12 @@ public class HttpRpcToAnotherNode : IServer {
     {
         try
         {
+            Console.WriteLine("trying to receive client command now");
             client.PostAsJsonAsync(Url + "/request/command", data);
         }
         catch (Exception e)
         {
-            Console.WriteLine("Received error at Receive client command function ");
-            Console.WriteLine($"{e.Message}");
+            Console.WriteLine("Received error at Receive client command function " + $"{e.Message}");
         }
     }
 
@@ -140,9 +139,9 @@ public class HttpRpcToAnotherNode : IServer {
             client.PostAsJsonAsync(Url + "/request/appendEntries", request);
             //await client.PostAsJsonAsync(Url + "/request/appendEntries", request);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
-            Console.WriteLine($"node {Url} is down");
+            Console.WriteLine($"node {Url} is down, caught error in the sendAppendEntriesLogToServer function " + ex.Message.ToString());
         }
     }
 

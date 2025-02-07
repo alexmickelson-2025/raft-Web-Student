@@ -103,6 +103,8 @@ This is where i displayed node status
             await Task.WhenAll(Urls.Select(async url => {
                 try 
                 {
+                    var willSendURL = url + "/nodeData";
+                    Console.WriteLine("about to send request to " + willSendURL);
                     var response = await http.GetStringAsync(url + "/nodeData");
                     Console.WriteLine($"Response from {url} asking for node data: {response}");
 
@@ -116,8 +118,8 @@ This is where i displayed node status
                         Console.WriteLine("did not get data for " + url);
                     }
                 }
-                catch(HttpRequestException) {
-                    Console.WriteLine($"node {url} is down");
+                catch(HttpRequestException ex) {
+                    Console.WriteLine($"node {url} is down in ONInitialized Function, error " +ex.Message.ToString());
                     data.TryRemove(url, out var removedNodeData);
                 }
                 catch (JsonException ex)
