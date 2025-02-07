@@ -109,6 +109,7 @@ This is where i displayed node status
                     var nodeData= await http.GetFromJsonAsync<NodeData>(url + "/nodeData");
                     Console.WriteLine($"Node Data: {nodeData.ToString()}");
                     if (nodeData != null) {
+                        Console.WriteLine("We got inside the if block for each node data");
                         data[url] = nodeData;
                     }
                     else {
