@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using System.Collections.Concurrent
+@using System.Text.Json
 @using library
 
 <PageTitle>Home</PageTitle>
@@ -116,6 +117,11 @@ This is where i displayed node status
                 }
                 catch(HttpRequestException) {
                     Console.WriteLine($"node {url} is down");
+                    data.TryRemove(url, out var removedNodeData);
+                }
+                catch (JsonException ex)
+                {
+                    Console.WriteLine($"JsonException for {url}: {ex.Message}");
                     data.TryRemove(url, out var removedNodeData);
                 }
             }).ToArray()
