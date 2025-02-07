@@ -36,9 +36,9 @@ This is where i displayed node status
            
             <div class="p-3">
                 <h3>Display the current state machine state on each node</h3>
-                @* @if(node.Value.StateDictionary.Count == 0) {
-                    <p>No data in state dictionary yet</p>
-                }
+                @if(node.Value?.StateDictionary?.Count == 0) {
+                    <p>No data in State yet</p>
+                } 
                 else {
                     <table class="table-striped">
                         <thead>
@@ -48,7 +48,7 @@ This is where i displayed node status
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in node.StateDictionary) {
+                            @foreach (var item in node.Value.StateDictionary) {
                                 <tr>
                                     <td>@item.Key</td>
                                     <td>@item.Value</td>
@@ -56,10 +56,10 @@ This is where i displayed node status
                             }
                         </tbody>
                     </table>
-                } *@
+                }
+
 
                 <p>Highest committed index is: @node.Value.CommittedEntryIndex</p>
-
                 <h5>Committed Logs (@node.Value.CommittedEntryIndex):</h5>
                 @* @for(int i = 0; i < node.Value.CommittedEntryIndex; i++) {
                     <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>

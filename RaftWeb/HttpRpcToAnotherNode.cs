@@ -97,19 +97,21 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
     {
+        Console.WriteLine($"In http rpc to another node we are choosing to try to respond to a vote for term {requestedVoteCurrentTerm}");
         var response = new AppendEntryResponse {
             TermNumber = requestedVoteCurrentTerm,
-            LogIndex = 1, //TODO: I don't know what to do for the log index here
+            LogIndex = 1, //TODO: I don't know what to do for the log index here besides refactor this to receive a voteResponseObject
             Accepted = voteGiven
         };
 
         try
         {
+            Console.WriteLine("Sending post request to cast my vote now");
             client.PostAsJsonAsync(Url + "/response/vote", response);
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"node {Url} is down, error {e.Message}");
+            Console.WriteLine($"node {Url} is down, error trying to cast my vote {e.Message}");
         }
     }
 

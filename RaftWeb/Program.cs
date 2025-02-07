@@ -51,7 +51,8 @@ app.MapGet("/nodeData", () =>
     CommittedEntryIndex = node.HighestCommittedIndex,
     Log =  node.LogBook,
     State = node.State,
-    NodeIntervalScalar = 0
+    NodeIntervalScalar = 0,
+    StateDictionary = node.StateDictionary
   };
 });
 
@@ -64,10 +65,10 @@ app.MapPost("/request/appendEntries", async (RaftLogEntry request) =>
   await Task.CompletedTask;
 });
  
-app.MapPost("/response/appendEntries", (AppendEntryResponse response, int respondingServerId) =>
+app.MapPost("/response/appendEntries", (AppendEntryResponse response) =>
 {
   logger.LogInformation("received append entries response {response}", response);
-  IServer? serverResponding = otherNodes.First(n => n.Id == respondingServerId);
+  IServer? serverResponding = otherNodes.First(n => n.Id == response.ServerRespondingId);
   node.ReceiveAppendEntriesLogResponseFrom(serverResponding, response);
 });
 
@@ -82,17 +83,17 @@ app.MapPost("/request/vote", (VoteRequest request) =>
 });
  
  
-app.MapPost("/response/vote", async (AppendEntryResponse response, int respondingServerId) =>
+app.MapPost("/response/vote", (AppendEntryResponse response) =>
 {
   logger.LogInformation("received vote response {response}", response);
-  //await node.ResponseVote(response);
-  IServer? serverResponding = otherNodes.Where(n => n.Id == respondingServerId).FirstOrDefault();
+  IServer? serverResponding = otherNodes.Where(n => n.Id == response.ServerRespondingId).FirstOrDefault();
   node.ReceiveVoteResponseFrom(serverResponding, response.TermNumber, response.Accepted);
 });
  
 //Client Command
 app.MapPost("/request/command", async ((string, string) data) =>
 {
+  Console.WriteLine("received client command ");
   node.ReceiveClientCommand(data);
 });
 
