@@ -93,7 +93,6 @@ app.MapPost("/response/vote", async (AppendEntryResponse response, int respondin
 //Client Command
 app.MapPost("/request/command", async ((string, string) data) =>
 {
-  //await node.SendCommand(data);
   node.ReceiveClientCommand(data);
 });
 

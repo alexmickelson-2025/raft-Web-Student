@@ -30,12 +30,9 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
-    //Rachel note: This is the version of the function I plan to keep (the other overloads are going to be removed)
-    //Question for Alex: What do I do with the other functions that this one calls? Can I just implement them through inner node type of style?
     public void ReceiveAppendEntriesLogFrom(IServer leader, IEnumerable<RaftLogEntry> requests)
     {
         Console.WriteLine("Trying to make post request for a node to receive an append entries log");        
-        //make an http call to this endpoint so that for another node it can call its personal node function (in its program.cs mapped endpoint)
 
         //for now, will remove later:
         foreach (var req in requests)
@@ -67,8 +64,14 @@ public class HttpRpcToAnotherNode : IServer {
 
     public void ReceiveClientCommand((string, string) data)
     {
-        
-        client.PostAsJsonAsync(Url + "/request/command", data);
+        try
+        {
+            client.PostAsJsonAsync(Url + "/request/command", data);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Received error at Receive client command function ");
+            Console.WriteLine($"{e.Message}");
     }
 
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
