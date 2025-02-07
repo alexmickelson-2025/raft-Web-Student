@@ -224,12 +224,14 @@ public class Server : IServer
         //We started the threads to listen first, so now we can actually go request a vote from all the servers.
         foreach (var follower in OtherServersList)
         {
-            this.SendRequestForVoteRPCTo(follower);
+            follower.SendRequestForVoteRPCTo(follower);
         }
     }
 
     public void SendRequestForVoteRPCTo(IServer server)
     {
+// i got a request from someone else
+
         //Rachel note: I think this might be a good one to just refactor. Instead of having it receive the actual server object it should be sending the vote request to
         //Have it receive just the ID of the server
         //Look it up from its list of servers.
@@ -246,19 +248,16 @@ public class Server : IServer
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))
             {
                 VotesCast.Add(requestedVoteCurrentTerm, serverRequesting);
-                SendVoteResponseTo(serverRequesting, requestedVoteCurrentTerm, true);
+                serverRequesting.ReceiveVoteResponseFrom(Id, requestedVoteCurrentTerm, true);
+                // SendVoteResponseTo(serverRequesting, requestedVoteCurrentTerm, true);
             }
         }
     }
 
-    private void SendVoteResponseTo(Server serverRequesting, int requestedVoteCurrentTerm, bool voteGiven)
-    {
-        serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, voteGiven);
-    }
-
     //todo check term in here
-    public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
+    public void ReceiveVoteResponseFrom(int requestorId, int requestedVoteCurrentTerm, bool voteGiven)
     {
+        //find Iserver with id
         if (voteGiven)
         { //potential bug: don't I need to also make sure that the vote is being 
             if (!VotesReceived.Contains(server))

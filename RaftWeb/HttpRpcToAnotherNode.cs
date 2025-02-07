@@ -159,13 +159,13 @@ public class HttpRpcToAnotherNode : IServer {
         // AppendEntryResponse response = new() {
             
         // };
-        // try {
-        //     client.PostAsJsonAsync("/response/vote", response);
-        // }
-        // catch (Exception e) {
-        //     Console.WriteLine("Error in SendREquestForVoteRPC to function " + e.Message.ToString());
-        // }
-        throw new NotImplementedException();
+        try {
+            client.PostAsJsonAsync(Url+"/request/vote", response);
+        }
+        catch (Exception e) {
+            Console.WriteLine("Error in SendREquestForVoteRPC to function " + e.Message.ToString());
+        }
+        // throw new NotImplementedException();
     }
 
     public void StartElection()
