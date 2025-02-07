@@ -81,7 +81,6 @@ public class HttpRpcToAnotherNode : IServer {
 
         var request = new VoteRequest()
         {
-            ServerRequestingVote = serverRequesting,
             requestingVoteId = serverRequesting.Id,
             CurrentTerm = requestedVoteCurrentTerm
         };
