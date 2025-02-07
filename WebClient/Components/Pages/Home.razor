@@ -22,7 +22,7 @@ This is where i displayed node status
 <div class="row">
     @foreach(var node in data) {
         <div class="p-3 col-4 row">
-            <div @* class="@StateClass(node.Value) *@ border p-3 rounded">
+            <div class="border p-3 rounded">
                 <p>Node @node.Value.Id</p>
                 <p>Term @node.Value.Term</p>
                 <p>State @node.Value.State</p>
