@@ -72,11 +72,12 @@ app.MapPost("/response/appendEntries", (AppendEntryResponse response, int respon
 });
 
 //Voting
-app.MapPost("/request/vote", async (VoteRequest request) =>
+app.MapPost("/request/vote", (VoteRequest request) =>
 {
   logger.LogInformation("received vote request {request}", request);
   foreach (var server in otherNodes) {
-    node.SendRequestForVoteRPCTo(server);
+    IServer? serverToSendTo = otherNodes.First(n => n.Id == request.requestingVoteId);
+    node.SendRequestForVoteRPCTo(serverToSendTo);
   }
 });
  
