@@ -102,7 +102,11 @@ This is where i displayed node status
             await Task.WhenAll(Urls.Select(async url => {
                 try 
                 {
-                    var nodeData= await http.GetFromJsonAsync<NodeData>(url);
+                    var response = await http.GetStringAsync(url + "/nodeData");
+                    Console.WriteLine($"Response from {url} asking for node data: {response}");
+
+                    var nodeData= await http.GetFromJsonAsync<NodeData>(url + "/nodeData");
+                    Console.WriteLine($"Node Data: {nodeData.ToString()}");
                     if (nodeData != null) {
                         data[url] = nodeData;
                     }
