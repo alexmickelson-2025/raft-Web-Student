@@ -13,6 +13,7 @@ services:
       timeout: 3s
       retries: 3
       start_period: 3s
+    command: dotnet run --project RaftWeb
   node2:
     build:
       context: .
@@ -27,6 +28,7 @@ services:
       timeout: 3s
       retries: 3
       start_period: 3s
+    command: dotnet run --project RaftWeb
   node3:
     build:
       context: .
@@ -41,6 +43,7 @@ services:
       timeout: 3s
       retries: 3
       start_period: 3s
+    command: dotnet run --project RaftWeb
   web_client:
     build:
       context: .

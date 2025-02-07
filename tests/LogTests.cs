@@ -561,7 +561,7 @@ public class LogTests
 
         //Assert
         //but we will change this so it asserts the previous log entry was received.
-        follower.Received().ReceiveAppendEntriesLogFrom(leader, [Arg.Is<IEnumerable<RaftLogEntry>>(log => log.LogIndex.Equals(1))]); 
+        follower.Received().ReceiveAppendEntriesLogFrom(leader, Arg.Is<IEnumerable<RaftLogEntry>>(log => log.Any(entry => entry.LogIndex.Equals(1)))); 
         
         follower.Received().ReceiveAppendEntriesLogFrom(leader, [secondLog]); 
          
