@@ -30,7 +30,7 @@ public class ServerElectionTests
     //}
 
     /********************************** *****************/
-
+    //Testing leader election: why am I not electing a leader??
     [Fact]
     public void Testing_Why_Leader_Not_Elected_Bug_fix_EnsureFollowersReceiveRequestForVote()
     {
@@ -48,6 +48,8 @@ public class ServerElectionTests
 
     }
 
+    //[Fact]
+    //public void Testing_when 
     //Testing #3
     //When a new node is initialized, it should be in follower state.
     [Fact]
@@ -262,7 +264,6 @@ public class ServerElectionTests
 
     //Testing #10
     //A follower that has not voted and is in an earlier term responds to a RequestForVoteRPC with yes. (the reply will be a separate RPC)
-    //NOTE: Sometimes this fails and sometimes this passes depending on which time I run it, but now that I've added thread.sleep it seems to work every time
     [Fact]
     public void IfHaveNotYetVoted_VoteForALaterTermRequest()
     {

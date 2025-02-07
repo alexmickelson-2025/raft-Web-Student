@@ -230,6 +230,10 @@ public class Server : IServer
 
     public void SendRequestForVoteRPCTo(IServer server)
     {
+        //Rachel note: I think this might be a good one to just refactor. Instead of having it receive the actual server object it should be sending the vote request to
+        //Have it receive just the ID of the server
+        //Look it up from its list of servers.
+        //And then have it send the response to that one??
         new Thread(() => server.ReceiveVoteRequestFrom(this, this.CurrentTerm)).Start();
         //server.ReceiveVoteRequestFrom(this, this.CurrentTerm);
     }
@@ -237,10 +241,6 @@ public class Server : IServer
     //The reason we pass the requestedVote current term (even though it's a property on the server requesting) is the server requesting might update its term after we receive it, so we can't trust that property and must specify it
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
-        if (NetworkDelay > 0)
-        {
-            Thread.Sleep(NetworkDelay);
-        }
         if (requestedVoteCurrentTerm > this.CurrentTerm)
         {
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))
