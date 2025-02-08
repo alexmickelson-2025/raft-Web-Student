@@ -230,7 +230,7 @@ public class Server : IServer
 
     public void SendRequestForVoteRPCTo(IServer server)
     {
-// i got a request from someone else
+        // i got a request from someone else
 
         //Rachel note: I think this might be a good one to just refactor. Instead of having it receive the actual server object it should be sending the vote request to
         //Have it receive just the ID of the server
@@ -248,7 +248,14 @@ public class Server : IServer
             if (!VotesCast.ContainsKey(requestedVoteCurrentTerm))
             {
                 VotesCast.Add(requestedVoteCurrentTerm, serverRequesting);
-                serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, true);
+                serverRequesting.ReceiveVoteResponseFrom(this, requestedVoteCurrentTerm, true); //this is here so all my tests don't break
+                VoteResponse response = new()
+                {
+                    ServerRespondingId = serverRequesting.Id,
+                    TermNumber = requestedVoteCurrentTerm,
+                    Accepted = true
+                };
+                serverRequesting.ReceiveVoteResponse(response);
             }
         }
     }
@@ -536,5 +543,12 @@ public class Server : IServer
     {
         IsPaused = false;
         timeSinceLastSentHeartbeatAsLeader.Restart();
+    }
+
+    public void ReceiveVoteResponse(VoteResponse response)
+    {
+        Console.WriteLine("We received a vote response in the new function from node " + response.ServerRespondingId.ToString());
+        var serverResponding = OtherServersList.Where(s => s.Id == response.ServerRespondingId).FirstOrDefault();
+        ReceiveVoteResponseFrom(serverResponding, response.TermNumber, response.Accepted);
     }
 }

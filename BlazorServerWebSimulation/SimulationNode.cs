@@ -112,7 +112,13 @@ public class SimulationNode: IServer {
 
     public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
     {
-        ((IServer)InnerNode).ReceiveVoteResponseFrom(server, requestedVoteCurrentTerm, voteGiven);
+        VoteResponse reply = new()
+        {
+            TermNumber = requestedVoteCurrentTerm,
+            ServerRespondingId = server.Id,
+            Accepted = voteGiven,
+        };
+        ((IServer)InnerNode).ReceiveVoteResponse(reply);
     }
 
     public void CommitEntry(int logIndex)
@@ -123,6 +129,11 @@ public class SimulationNode: IServer {
     public void ReceiveVoteRequestFrom(Server serverRequesting, int requestedVoteCurrentTerm)
     {
         ((IServer)InnerNode).ReceiveVoteRequestFrom(serverRequesting, requestedVoteCurrentTerm);
+    }
+
+    public void ReceiveVoteResponse(VoteResponse response)
+    {
+        ((IServer)InnerNode).ReceiveVoteResponse(response);
     }
 
     //public int Id {get => InnerNode.Id; set => InnerNode.Id = value;}

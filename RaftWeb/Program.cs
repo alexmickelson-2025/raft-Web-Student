@@ -77,17 +77,18 @@ app.MapPost("/request/vote", (VoteRequest request) =>
 {
   logger.LogInformation("received vote request {request}", request);
   foreach (var server in otherNodes) {
-    IServer? serverToSendTo = otherNodes.First(n => n.Id == request.requestingVoteId);
+    IServer? serverToSendTo = otherNodes.First(n => n.Id == request.ServerRequestingId);
     node.SendRequestForVoteRPCTo(serverToSendTo);
   }
 });
  
  
-app.MapPost("/response/vote", (AppendEntryResponse response) =>
+app.MapPost("/response/vote", (VoteResponse response) =>
 {
   logger.LogInformation("received vote response {response}", response);
   IServer? serverResponding = otherNodes.Where(n => n.Id == response.ServerRespondingId).FirstOrDefault();
-  node.ReceiveVoteResponseFrom(serverResponding, response.TermNumber, response.Accepted);
+    node.ReceiveVoteResponse(response);
+  //node.ReceiveVoteResponseFrom(serverResponding, response.TermNumber, response.Accepted);
 });
  
 //Client Command

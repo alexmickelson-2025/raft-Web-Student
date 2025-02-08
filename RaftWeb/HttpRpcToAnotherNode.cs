@@ -24,7 +24,7 @@ public class HttpRpcToAnotherNode : IServer {
         Url = url;
     }
 
-    public void ReceiveAppendEntriesLogFrom(IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
+    public void ReceiveAppendEntriesLogFrom(library.IServer server, int requestNumber, int requestCurrentTerm, RaftLogEntry? logEntry = null)
     {
         Console.WriteLine("ReceiveAppendEntriesLogFrom function with lots of parameters.");
         throw new NotImplementedException();
@@ -80,7 +80,7 @@ public class HttpRpcToAnotherNode : IServer {
 
         var request = new VoteRequest()
         {
-            requestingVoteId = serverRequesting.Id,
+            ServerRequestingId = serverRequesting.Id,
             CurrentTerm = requestedVoteCurrentTerm
         };
         try
@@ -94,26 +94,6 @@ public class HttpRpcToAnotherNode : IServer {
         }
     }
 
-    public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven)
-    {
-        Console.WriteLine($"In http rpc to another node we are choosing to try to respond to a vote for term {requestedVoteCurrentTerm}");
-        var response = new AppendEntryResponse {
-            TermNumber = requestedVoteCurrentTerm,
-            LogIndex = 1, //TODO: I don't know what to do for the log index here besides refactor this to receive a voteResponseObject
-            Accepted = voteGiven
-        };
-
-        try
-        {
-            Console.WriteLine("Sending post request to cast my vote now");
-            client.PostAsJsonAsync(Url + "/response/vote", response);
-        }
-        catch (HttpRequestException e)
-        {
-            Console.WriteLine($"node {Url} is down, error trying to cast my vote {e.Message}");
-        }
-    }
-
     public void ResetElectionTimeout()
     {
         throw new NotImplementedException();
@@ -124,7 +104,7 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
-    public void SendAppendEntriesLogRPCTo(IServer follower)
+    public void SendAppendEntriesLogRPCTo(library.IServer follower)
     {
         //Note: I put this now just to be able to test.
         var request = new RaftLogEntry{
@@ -150,7 +130,7 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
-    public void SendRequestForVoteRPCTo(IServer server)
+    public void SendRequestForVoteRPCTo(library.IServer server)
     {
         VoteRequest request = new() {
             ServerRequestingId = this.Id,
@@ -203,5 +183,19 @@ public class HttpRpcToAnotherNode : IServer {
     public void CommitEntry(int logIndex)
     {
         throw new NotImplementedException();
+    }
+
+    public void ReceiveVoteResponse(VoteResponse response)
+    {
+        Console.WriteLine($"In http rpc to another node we are choosing to try to respond to a vote for term {response.TermNumber}");
+        try
+        {
+            Console.WriteLine("Sending post request to cast my vote now");
+            client.PostAsJsonAsync(Url + "/response/vote", response);
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"node {Url} is down, error trying to cast my vote {e.Message}");
+        }
     }
 }

@@ -502,7 +502,7 @@ public class ServerElectionTests
         Thread.Sleep(51); //A heartbeat should have been sent at 50ms, so now we should see it
 
         //Assert
-        receivesHeartbeat.Received(1).ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
+        receivesHeartbeat.Received().ReceiveAppendEntriesLogFrom(winningElection, 1, 2);
 
     }
 
