@@ -89,7 +89,7 @@ public class LogTests
 
         //Step 2 of the Act:
         //leader.RestartTimeSinceHearingFromLeader();
-        leader.SendHeartbeatToAllNodes(); //normally this gets called every 50ms but that was causing problems with our heartbeat time being too fast, so I'll manually call it here and I'm turning heartbeats off.
+        leader.SendHeartbeatRPCToAllNodes(); //normally this gets called every 50ms but that was causing problems with our heartbeat time being too fast, so I'll manually call it here and I'm turning heartbeats off.
         Thread.Sleep(50); //long enough for a heartbeat to go out
 
         //Step 2 of the Assert:
@@ -187,7 +187,7 @@ public class LogTests
         leader.HighestCommittedIndex = 3;
 
         //Act
-        leader.SendAppendEntriesLogTo(follower1);
+        leader.SendAppendEntriesLogRPCTo(follower1);
 
         //Assert
         follower1.Received(1).ReceiveAppendEntriesLogFrom(leader, [Arg.Is<RaftLogEntry>(log => log.LeaderHighestCommittedIndex.Equals(3))]);
@@ -441,11 +441,11 @@ public class LogTests
         leader.LogBook.Add(logEntry); //So we have an index fo rthe log book.
 
         //Act
-        leader.SendAppendEntriesLogTo(follower1);
-        leader.SendAppendEntriesLogTo(follower2);
-        leader.SendAppendEntriesLogTo(follower3);
-        leader.SendAppendEntriesLogTo(follower4);
-        leader.SendAppendEntriesLogTo(follower5);
+        leader.SendAppendEntriesLogRPCTo(follower1);
+        leader.SendAppendEntriesLogRPCTo(follower2);
+        leader.SendAppendEntriesLogRPCTo(follower3);
+        leader.SendAppendEntriesLogRPCTo(follower4);
+        leader.SendAppendEntriesLogRPCTo(follower5);
 
         //It even receives a response from some of them:
         leader.ReceiveAppendEntriesLogResponseFrom(follower1, PositiveReply);

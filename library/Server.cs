@@ -75,7 +75,7 @@ public class Server : IServer
         ElectionTimeout = val * ElectionTimeoutAdjustmentFactor;
     }
 
-    public void SendAppendEntriesLogTo(IServer follower)
+    public void SendAppendEntriesLogRPCTo(IServer follower)
     {
         Console.WriteLine("Called Send Append Entries Log To function");
         //make a new appendEntriesLog to pass along
@@ -266,7 +266,7 @@ public class Server : IServer
         }
     }
 
-    public void SendHeartbeatToAllNodes()
+    public void SendHeartbeatRPCToAllNodes()
     {
         // Console.WriteLine("sending heartbeat to all nodes now");
         foreach (var server in OtherServersList)
@@ -283,7 +283,7 @@ public class Server : IServer
     public void WinElection()
     {
         Console.WriteLine("Winning an election now");
-        this.SendHeartbeatToAllNodes();
+        this.SendHeartbeatRPCToAllNodes();
         this.State = States.Leader;
         //TODO: is this what we want to do? setting recognized leader to null??
         this.RecognizedLeader = null;
@@ -387,12 +387,12 @@ public class Server : IServer
                 ////EDGE case just in case
                 if (!timeSinceLastSentHeartbeatAsLeader.IsRunning && !IsPaused)
                 {
-                    this.SendHeartbeatToAllNodes();
+                    this.SendHeartbeatRPCToAllNodes();
                     timeSinceLastSentHeartbeatAsLeader.Start();
                 }
                 else if (timeSinceLastSentHeartbeatAsLeader.ElapsedMilliseconds > IntervalAtWhichLeaderShouldSendHeartbeatsInMs)
                 {
-                    this.SendHeartbeatToAllNodes();
+                    this.SendHeartbeatRPCToAllNodes();
                     timeSinceLastSentHeartbeatAsLeader.Restart();
                 }
                 ////EDGE case just in case

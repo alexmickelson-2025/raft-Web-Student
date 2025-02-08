@@ -26,8 +26,8 @@ namespace library
         public void ReceiveVoteResponseFrom(IServer server, int requestedVoteCurrentTerm, bool voteGiven);
         void ResetElectionTimeout();
         void PauseTimeSinceHearingFromLeader();
-        void SendAppendEntriesLogTo(IServer follower);
-        void SendHeartbeatToAllNodes();
+        void SendAppendEntriesLogRPCTo(IServer follower);
+        void SendHeartbeatRPCToAllNodes();
         void SendRequestForVoteRPCTo(IServer server);
         void StartElection();
         void WinElection();

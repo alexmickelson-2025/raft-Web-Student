@@ -35,14 +35,14 @@ public class SimulationNode: IServer {
         ((IServer)InnerNode).ResetElectionTimeout();
     }
 
-    public void SendAppendEntriesLogTo(IServer follower)
+    public void SendAppendEntriesLogRPCTo(IServer follower)
     {
-        ((IServer)InnerNode).SendAppendEntriesLogTo(follower);
+        ((IServer)InnerNode).SendAppendEntriesLogRPCTo(follower);
     }
 
-    public void SendHeartbeatToAllNodes()
+    public void SendHeartbeatRPCToAllNodes()
     {
-        ((IServer)InnerNode).SendHeartbeatToAllNodes();
+        ((IServer)InnerNode).SendHeartbeatRPCToAllNodes();
     }
 
     public void SendRequestForVoteRPCTo(Server server)

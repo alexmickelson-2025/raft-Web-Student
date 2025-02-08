@@ -9,6 +9,6 @@ namespace library;
 public class VoteRequest
 {
     //public IServer? ServerRequestingVote { get; set; }
-    public int requestingVoteId { get; set; }
+    public int ServerRequestingId { get; set; }
     public int CurrentTerm { get; set; }
 }

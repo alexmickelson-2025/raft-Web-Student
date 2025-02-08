@@ -124,7 +124,7 @@ public class HttpRpcToAnotherNode : IServer {
         throw new NotImplementedException();
     }
 
-    public void SendAppendEntriesLogTo(IServer follower)
+    public void SendAppendEntriesLogRPCTo(IServer follower)
     {
         //Note: I put this now just to be able to test.
         var request = new RaftLogEntry{
@@ -144,7 +144,7 @@ public class HttpRpcToAnotherNode : IServer {
         }
     }
 
-    public void SendHeartbeatToAllNodes()
+    public void SendHeartbeatRPCToAllNodes()
     {
         Console.WriteLine("Sending heartbeat to all nodes");
         throw new NotImplementedException();
@@ -153,10 +153,10 @@ public class HttpRpcToAnotherNode : IServer {
     public void SendRequestForVoteRPCTo(IServer server)
     {
         VoteRequest request = new() {
-            requestingVoteId = this.Id,
+            ServerRequestingId = this.Id,
             CurrentTerm = this.CurrentTerm
         };
-        
+
         try {
             client.PostAsJsonAsync(Url+"/request/vote", request);
         }
