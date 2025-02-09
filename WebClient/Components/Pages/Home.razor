@@ -28,12 +28,8 @@ This is where i displayed node status
                 <p>State @node.Value.State</p>
                 <p>Current leader @node.Value.CurrentTermLeader?.Id</p>
                 <p>Election Timeout @node.Value.ElectionTimeout miliseconds</p>
-                @if (node.Value?.State != States.Leader) {
-                    @* <p>Time since hearing from leader @node.Value?.TimtimeSinceHearingFromLeader.ElapsedMilliseconds</p> *@
-                    @* <p>Time until it will start an election: @(node.ElectionTimeout - node.InnerNode.timeSinceHearingFromLeader.ElapsedMilliseconds)</p> *@
-                }
             </div>
-           
+
             <div class="p-3">
                 <h3>Display the current state machine state on each node</h3>
                 @if(node.Value?.StateDictionary?.Count == 0) {
@@ -61,34 +57,67 @@ This is where i displayed node status
 
                 <p>Highest committed index is: @node.Value.CommittedEntryIndex</p>
                 <h5>Committed Logs (@node.Value.CommittedEntryIndex):</h5>
-                @* @for(int i = 0; i < node.Value.CommittedEntryIndex; i++) {
-                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
-                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
-    using System.Diagnostics.Eventing.Reader;
-                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
-                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
-                    <p>Current Term: @node.LogBook[i].TermNumber</p>
+                @for(int i = 0; i < node.Value.CommittedEntryIndex; i++) {
+                    <p>Key: @node.Value.Log[i].Command.Item1, Value: @node.Value.Log[i].Command.Item2</p>
+                    <p>Previous Term: @node.Value.Log[i].PreviousLogTerm</p>
+                    <p>Previous Log Index: @node.Value.Log[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.Value.Log[i].LogIndex)</p>
+                    <p>Current Term: @node.Value.Log[i].TermNumber</p>
                     <p>Log is committed</p>
                 }
 
-                <h5>Uncommitted Logs: (@(node.LogBook.Count() - node.HighestCommittedIndex))</h5>
-                <p>Have count @node.LogBook.Count()</p>
+                <h5>Uncommitted Logs: (@(node.Value.Log.Count() - node.Value.CommittedEntryIndex))</h5>
+                <p>Have count @node.Value.Log.Count()</p>
 
-                @for (int i = @node.HighestCommittedIndex; i < node.LogBook.Count(); i++) {
-                    <p>Key: @node.LogBook[i].Command.Item1, Value: @node.LogBook[i].Command.Item2</p>
-                    <p>Previous Term: @node.LogBook[i].PreviousLogTerm</p>
-                    <p>Previous Log Index: @node.LogBook[i].PreviousLogIndex</p>
-                    <p>Current Log Index: @i (also recorded as @node.LogBook[i].LogIndex)</p>
-                    <p>Current Term: @node.LogBook[i].TermNumber</p>
-                    <p>Command: @node.LogBook[i].Command.Item1 =>  @node.LogBook[i].Command.Item2</p>
+                @for (int i = @node.Value.CommittedEntryIndex; i < node.Value.Log.Count(); i++)
+                {
+                    <p>Key: @node.Value.Log[i].Command.Item1, Value: @node.Value.Log[i].Command.Item2</p>
+                    <p>Previous Term: @node.Value.Log[i].PreviousLogTerm</p>
+                    <p>Previous Log Index: @node.Value.Log[i].PreviousLogIndex</p>
+                    <p>Current Log Index: @i (also recorded as @node.Value.Log[i].LogIndex)</p>
+                    <p>Current Term: @node.Value.Log[i].TermNumber</p>
+                    <p>Command: @node.Value.Log[i].Command.Item1 =>  @node.Value.Log[i].Command.Item2</p>
                     <p>Log is <i>NOT</i> committed</p>
-                } *@
+                }
             </div>
         </div>
     }
 </div>
 
+<div class="col">
+    <div class="border p-3 rounded-3">
+        <label>
+            Key <input class="form-control" @bind=userInputKey />
+        </label>
+        <label>
+            Value <input class="form-control" @bind=userInputValue />
+        </label>
+        <hr>
+        @foreach (var node in data)
+        {
+            <button class="btn btn-outline-primary mx-1" @onclick="() => SendCommand(node.Key)"> Send to Node @node.Value.Id</button>
+        }
+        <div>
+            Status of message: @commandStatus
+        </div>
+    </div>
+
+    @* < div class= "bg-body-secondary my-3 p-1 rounded-3" >
+        < strong > LOG </ strong >
+        @foreach(var(log, index) in node.InnerNode.Log.Select((l, i) => (l, i)))
+        {
+        < div class=@(index <= node.InnerNode.CommittedEntryIndex ? "text-success" : "") >
+            @log.TermId - @log.Key: @log.Value
+        </ div >
+        }
+    </ div > *@
+</div>
+
 @code {
+    string userInputKey = "";
+    string userInputValue = "";
+    string commandStatus = "";
+
     NodeData tempNode = new();
     ConcurrentDictionary<string, NodeData> data = [];
     string TermClass(NodeData node) =>   "";
@@ -98,7 +127,7 @@ This is where i displayed node status
     protected override void OnInitialized() {
         Console.WriteLine("Loading page, trying to parse urls");
         Console.WriteLine("Urls has count " + Urls?.Count() ?? "null");
-        
+
         Timer timer= new Timer(async _ => {
             await Task.WhenAll(Urls.Select(async url => {
                 try 
@@ -142,5 +171,18 @@ This is where i displayed node status
         if (node.State == States.Follower)
             return "text-body-secondary";
         return "";
+    }
+
+    async Task SendCommand(string destinationUrl)
+    {
+        commandStatus = "sending";
+        HttpClient client = new();
+        try {
+            await client.PostAsJsonAsync(destinationUrl + "/receive/command", (userInputKey, userInputValue));
+        }
+        catch (Exception ex) {
+            Console.WriteLine("Error sending client command to " + destinationUrl + " : " + ex.Message.ToString());
+        }
+        commandStatus = "sent";
     }
 }
